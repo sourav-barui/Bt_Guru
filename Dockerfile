@@ -16,7 +16,9 @@ RUN apk add --no-cache \
     oniguruma-dev \
     linux-headers \
     mysql-client \
-    bash
+    bash \
+    nodejs \
+    npm
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
@@ -45,6 +47,9 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progre
 
 # Copy application
 COPY . .
+
+# Install Node dependencies and build Vite assets
+RUN npm install && npm run build
 
 # Run composer scripts now that full app is present
 RUN composer run-script post-autoload-dump --no-dev || true
