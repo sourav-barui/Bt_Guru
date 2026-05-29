@@ -48,6 +48,25 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progre
 # Copy application
 COPY . .
 
+# Create production .env (overrides local .env)
+RUN echo "APP_NAME=Bt_Guru" > .env && \
+    echo "APP_ENV=production" >> .env && \
+    echo "APP_DEBUG=false" >> .env && \
+    echo "APP_KEY=base64:4XUYkqQw2E6rSifjMPitm5VYnvB8VePOM2DMBQykpaE=" >> .env && \
+    echo "APP_URL=https://btguru.tech" >> .env && \
+    echo "CENTRAL_DOMAIN=btguru.tech" >> .env && \
+    echo "ADMIN_SUBDOMAIN=admin" >> .env && \
+    echo "DB_CONNECTION=mysql" >> .env && \
+    echo "DB_HOST=btguru-btgurudb-red7t9" >> .env && \
+    echo "DB_PORT=3306" >> .env && \
+    echo "DB_DATABASE=bt_guru" >> .env && \
+    echo "DB_USERNAME=bt_guru" >> .env && \
+    echo "DB_PASSWORD=jJpEplhZcgbMzVQDhXzN" >> .env && \
+    echo "CACHE_STORE=database" >> .env && \
+    echo "SESSION_DRIVER=database" >> .env && \
+    echo "QUEUE_CONNECTION=database" >> .env && \
+    echo "MAIL_MAILER=log" >> .env
+
 # Install Node dependencies and build Vite assets
 RUN npm install && npm run build
 
