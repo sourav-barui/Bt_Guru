@@ -1,0 +1,8 @@
+# Place this file as .htaccess in your Hostinger public_html ROOT
+# (one level ABOVE the public/ folder, if you upload the full project there)
+# OR set document root to public/ in Hostinger hPanel
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
