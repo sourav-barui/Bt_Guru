@@ -52,6 +52,7 @@ RUN composer run-script post-autoload-dump --no-dev || true
 # Copy PHP production configs
 COPY docker/php.ini /usr/local/etc/php/conf.d/99-production.ini
 COPY docker/opcache.ini /usr/local/etc/php/conf.d/99-opcache.ini
+COPY docker/www.conf /usr/local/etc/php-fpm.d/www.conf
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html && \
