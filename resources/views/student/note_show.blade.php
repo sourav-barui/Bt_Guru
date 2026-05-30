@@ -200,9 +200,14 @@
             <span id="pdfPageNum" style="color:white;font-size:13px;font-weight:600;letter-spacing:1px;min-width:50px;text-align:center;">1 / 1</span>
             <button onclick="pdfNextPage()" id="btnNext" style="background:none;border:none;color:white;padding:8px;opacity:1;transition:opacity 0.2s;"><svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
         </div>
-        <button onclick="resetZoom()" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:8px;border-radius:8px;display:flex;align-items:center;" title="Fit to screen">
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
-        </button>
+        <div style="display:flex;align-items:center;gap:4px;">
+            <button onclick="togglePageList()" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:8px;border-radius:8px;display:flex;align-items:center;" title="Page list">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <button onclick="resetZoom()" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:8px;border-radius:8px;display:flex;align-items:center;" title="Fit to screen">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+            </button>
+        </div>
     </div>
 
     <!-- First-use swipe hint overlay -->
@@ -215,6 +220,19 @@
                 <span style="font-size:13px;opacity:0.7;">Scroll to zoom • Drag thumbnail to pan</span>
             </div>
             <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="opacity:0.6;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+    </div>
+
+    <!-- Page list overlay -->
+    <div id="pageListOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:220;flex-direction:column;overflow-y:auto;padding:16px;padding-bottom:80px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0 16px;position:sticky;top:0;background:rgba(0,0,0,0.92);z-index:5;">
+            <span style="color:white;font-size:16px;font-weight:600;">Select Page</span>
+            <button onclick="togglePageList()" style="background:none;border:none;color:white;padding:8px;">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div id="pageListGrid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(100px, 1fr));gap:12px;">
+            <!-- Page thumbnails injected here -->
         </div>
     </div>
 
@@ -688,6 +706,60 @@
         }
         lastTapTime = now;
     });
+
+    // ===== Page List Overlay =====
+    function togglePageList() {
+        const overlay = document.getElementById('pageListOverlay');
+        if (overlay.style.display === 'flex') {
+            overlay.style.display = 'none';
+        } else {
+            overlay.style.display = 'flex';
+            renderPageList();
+        }
+    }
+
+    function renderPageList() {
+        const grid = document.getElementById('pageListGrid');
+        grid.innerHTML = '';
+        for (let i = 1; i <= totalPages; i++) {
+            const item = document.createElement('div');
+            item.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:8px;border-radius:8px;background:rgba(255,255,255,0.05);border:2px solid ' + (i === currentPage ? '#3b82f6' : 'transparent') + ';';
+            item.onclick = function() { goToPage(i); };
+
+            const thumb = document.createElement('canvas');
+            thumb.width = 100;
+            thumb.height = 140;
+            thumb.style.cssText = 'width:100%;height:auto;border-radius:4px;background:#1a1a2e;';
+            item.appendChild(thumb);
+
+            const label = document.createElement('span');
+            label.textContent = 'Page ' + i;
+            label.style.cssText = 'color:white;font-size:11px;';
+            item.appendChild(label);
+
+            grid.appendChild(item);
+
+            // Render thumbnail for this page
+            (function(pageNum, cvs) {
+                if (!pdfDoc) return;
+                pdfDoc.getPage(pageNum).then(function(page) {
+                    const vp = page.getViewport({scale: Math.min(100 / page.getViewport({scale:1}).width, 140 / page.getViewport({scale:1}).height)});
+                    cvs.width = vp.width;
+                    cvs.height = vp.height;
+                    page.render({canvasContext: cvs.getContext('2d'), viewport: vp});
+                });
+            })(i, thumb);
+        }
+    }
+
+    function goToPage(num) {
+        if (num < 1 || num > totalPages) return;
+        currentPage = num;
+        resetZoom();
+        updatePageNum();
+        renderCurrentPage();
+        togglePageList();
+    }
 
     // ===== Show hint on first view (once per session) =====
     function showSwipeHint() {
