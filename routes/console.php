@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 // Auto cleanup cache and old logs every 6 hours for smooth running and disk free
 Schedule::command('system:cleanup')->everySixHours()->withoutOverlapping()->appendOutputTo(storage_path('logs/cleanup.log'));
+
+// Remove orphaned note PDFs weekly (Sundays 2 AM) — files deleted from DB but still on disk
+Schedule::command('notes:cleanup')->weeklyOn(0, '02:00')->withoutOverlapping()->appendOutputTo(storage_path('logs/cleanup.log'));
