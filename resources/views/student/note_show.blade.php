@@ -354,6 +354,84 @@
         });
     }
 
+    // ===== IndexedDB Image Cache for Fast Page Reloads =====
+    const DB_NAME = 'PdfNoteCache';
+    const DB_VERSION = 1;
+    const STORE_NAME = 'pages';
+    const NOTE_ID = {{ $note->id }};
+    let db = null;
+
+    function openCacheDB() {
+        return new Promise(function(resolve, reject) {
+            const req = indexedDB.open(DB_NAME, DB_VERSION);
+            req.onerror = function() { reject(req.error); };
+            req.onsuccess = function() { db = req.result; resolve(db); };
+            req.onupgradeneeded = function(e) {
+                const database = e.target.result;
+                if (!database.objectStoreNames.contains(STORE_NAME)) {
+                    database.createObjectStore(STORE_NAME, {keyPath: 'key'});
+                }
+            };
+        });
+    }
+
+    function cacheKey(pageNum) {
+        return 'note_' + NOTE_ID + '_page_' + pageNum;
+    }
+
+    async function getCachedPage(pageNum) {
+        if (!db) await openCacheDB();
+        return new Promise(function(resolve) {
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const store = tx.objectStore(STORE_NAME);
+            const req = store.get(cacheKey(pageNum));
+            req.onsuccess = function() {
+                if (req.result && req.result.dataUrl) {
+                    // Check age: expire after 7 days
+                    const ageDays = (Date.now() - req.result.savedAt) / (1000 * 60 * 60 * 24);
+                    if (ageDays > 7) { resolve(null); return; }
+                    resolve(req.result.dataUrl);
+                } else {
+                    resolve(null);
+                }
+            };
+            req.onerror = function() { resolve(null); };
+        });
+    }
+
+    async function savePageToCache(pageNum, dataUrl) {
+        if (!db) await openCacheDB();
+        return new Promise(function(resolve) {
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const store = tx.objectStore(STORE_NAME);
+            store.put({key: cacheKey(pageNum), dataUrl: dataUrl, savedAt: Date.now()});
+            tx.oncomplete = function() { resolve(); };
+            tx.onerror = function() { resolve(); };
+        });
+    }
+
+    async function loadFromCache(pageNum) {
+        const cached = await getCachedPage(pageNum);
+        if (!cached) return false;
+        const canvas = document.getElementById('currentPageCanvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.onload = function() {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            canvasW = img.width;
+            canvasH = img.height;
+            canvas.style.width = canvas.style.width || 'auto';
+            canvas.style.height = canvas.style.height || 'auto';
+            ctx.drawImage(img, 0, 0);
+            drawWatermark(ctx, canvas.width, canvas.height);
+            renderThumbnail();
+            document.getElementById('pdfLoading').style.display = 'none';
+        };
+        img.src = cached;
+        return true;
+    }
+
     // ===== PDF.js Canvas Viewer (All Modes: Web + PWA) =====
     function initPdfViewer() {
         // Always use canvas viewer with watermark
@@ -460,8 +538,21 @@
     }
 
     function renderCurrentPage() {
+        // Try cache first for instant load
+        loadFromCache(currentPage).then(function(cacheLoaded) {
+            if (cacheLoaded) {
+                // Cache hit: page shown instantly. Now re-render from PDF in background to refresh cache.
+                renderFromPdfAndCache(currentPage);
+            } else {
+                // Cache miss: render from PDF and save
+                renderFromPdfAndCache(currentPage);
+            }
+        });
+    }
+
+    function renderFromPdfAndCache(pageNum) {
         const canvas = document.getElementById('currentPageCanvas');
-        pdfDoc.getPage(currentPage).then(function(page) {
+        pdfDoc.getPage(pageNum).then(function(page) {
             const container = document.getElementById('singlePageContainer');
             const maxWidth = container.clientWidth - 32;
             const maxHeight = container.clientHeight - 32;
@@ -469,19 +560,15 @@
             const pageRatio = viewport.width / viewport.height;
             const containerRatio = maxWidth / maxHeight;
 
-            // Fit to container while maintaining exact aspect ratio
             let displayWidth, displayHeight;
             if (pageRatio > containerRatio) {
-                // Page is wider than container: fit to width
                 displayWidth = maxWidth;
                 displayHeight = maxWidth / pageRatio;
             } else {
-                // Page is taller than container: fit to height
                 displayHeight = maxHeight;
                 displayWidth = maxHeight * pageRatio;
             }
 
-            // Render at high resolution for crisp images
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
             const renderScale = Math.min(5.0, Math.max(2.0, (displayWidth / viewport.width) * dpr));
 
@@ -493,7 +580,6 @@
             canvasW = renderViewport.width;
             canvasH = renderViewport.height;
 
-            // CSS display size maintains exact PDF aspect ratio
             canvas.style.width = displayWidth + 'px';
             canvas.style.height = displayHeight + 'px';
             canvas.style.maxWidth = '100%';
@@ -503,6 +589,13 @@
             renderTask.promise.then(function() {
                 drawWatermark(ctx, canvas.width, canvas.height);
                 renderThumbnail();
+                // Save rendered page to IndexedDB for fast future loads
+                try {
+                    const dataUrl = canvas.toDataURL('image/png');
+                    savePageToCache(pageNum, dataUrl);
+                } catch (e) {
+                    // toDataURL may fail for large canvases, ignore
+                }
             });
         });
     }
