@@ -11,6 +11,7 @@ class LiveClassController extends Controller
     public function index()
     {
         $student = Auth::user();
+        $tenant = app('current_tenant');
 
         // Get course IDs the student is enrolled in (active/approved)
         $courseIds = $student->enrollments()
@@ -19,10 +20,13 @@ class LiveClassController extends Controller
 
         $now = now();
 
-        // Upcoming: Enrolled courses OR public classes
-        $upcoming = LiveClass::where(function($q) use ($courseIds) {
+        // Upcoming: Enrolled courses OR public classes from THIS tenant only
+        $upcoming = LiveClass::where(function($q) use ($courseIds, $tenant) {
                 $q->whereIn('course_id', $courseIds)
-                  ->orWhere('is_public', true);
+                  ->orWhere(function($q2) use ($tenant) {
+                      $q2->where('is_public', true)
+                         ->where('tenant_id', $tenant->id);
+                  });
             })
             ->where('status', 'scheduled')
             ->where('scheduled_at', '>', $now)
@@ -30,20 +34,26 @@ class LiveClassController extends Controller
             ->orderBy('scheduled_at')
             ->get();
 
-        // Live Now: Enrolled courses OR public classes
-        $liveNow = LiveClass::where(function($q) use ($courseIds) {
+        // Live Now: Enrolled courses OR public classes from THIS tenant only
+        $liveNow = LiveClass::where(function($q) use ($courseIds, $tenant) {
                 $q->whereIn('course_id', $courseIds)
-                  ->orWhere('is_public', true);
+                  ->orWhere(function($q2) use ($tenant) {
+                      $q2->where('is_public', true)
+                         ->where('tenant_id', $tenant->id);
+                  });
             })
             ->where('status', 'live')
             ->with('course', 'creator')
             ->orderBy('scheduled_at')
             ->get();
 
-        // Past: Enrolled courses OR public classes
-        $past = LiveClass::where(function($q) use ($courseIds) {
+        // Past: Enrolled courses OR public classes from THIS tenant only
+        $past = LiveClass::where(function($q) use ($courseIds, $tenant) {
                 $q->whereIn('course_id', $courseIds)
-                  ->orWhere('is_public', true);
+                  ->orWhere(function($q2) use ($tenant) {
+                      $q2->where('is_public', true)
+                         ->where('tenant_id', $tenant->id);
+                  });
             })
             ->whereIn('status', ['completed', 'cancelled'])
             ->with('course', 'creator')
