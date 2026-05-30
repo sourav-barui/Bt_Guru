@@ -201,8 +201,9 @@
             <button onclick="pdfNextPage()" id="btnNext" style="background:none;border:none;color:white;padding:8px;opacity:1;transition:opacity 0.2s;"><svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
         </div>
         <div style="display:flex;align-items:center;gap:4px;">
-            <button onclick="togglePageList()" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:8px;border-radius:8px;display:flex;align-items:center;" title="Page list">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <button onclick="togglePageList()" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:8px 12px;border-radius:8px;display:flex;align-items:center;gap:4px;font-size:12px;" title="Page list">
+                <svg width="18" height="18" fill="none" stroke="white" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                <span>Pages</span>
             </button>
             <button onclick="resetZoom()" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:8px;border-radius:8px;display:flex;align-items:center;" title="Fit to screen">
                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
@@ -211,7 +212,7 @@
     </div>
 
     <!-- First-use swipe hint overlay -->
-    <div id="swipeHint" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:250;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;text-align:center;padding:24px;animation:fadeOut 3s forwards;animation-delay:2s;">
+    <div id="swipeHint" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:250;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;text-align:center;padding:24px;animation:fadeOut 3s forwards;animation-delay:2s;">
         <div style="display:flex;align-items:center;gap:40px;color:white;">
             <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="opacity:0.6;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
@@ -429,29 +430,28 @@
     function renderCurrentPage() {
         const canvas = document.getElementById('currentPageCanvas');
         pdfDoc.getPage(currentPage).then(function(page) {
-            // Fit page to viewport while maintaining aspect ratio
             const container = document.getElementById('singlePageContainer');
             const maxWidth = container.clientWidth - 32;
             const maxHeight = container.clientHeight - 32;
             const viewport = page.getViewport({scale: 1});
-            const fitScale = Math.min(maxWidth / viewport.width, maxHeight / viewport.height, 3);
 
-            // Use device pixel ratio for crisp rendering (2x or 3x on Retina/mobile)
-            const dpr = Math.min(window.devicePixelRatio || 1, 3);
-            const renderScale = fitScale * dpr;
+            // Scale to fit screen
+            const fitScale = Math.min(maxWidth / viewport.width, maxHeight / viewport.height);
+            // Ensure minimum high quality (scale 2.0) for crisp images, cap at 5.0
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const renderScale = Math.min(5.0, Math.max(2.0, fitScale * dpr));
 
             const renderViewport = page.getViewport({scale: renderScale});
             const ctx = canvas.getContext('2d');
 
-            // High-res canvas backing store
             canvas.width = renderViewport.width;
             canvas.height = renderViewport.height;
             canvasW = renderViewport.width;
             canvasH = renderViewport.height;
 
-            // Display size fits container (CSS pixels)
-            canvas.style.width = (renderViewport.width / dpr) + 'px';
-            canvas.style.height = (renderViewport.height / dpr) + 'px';
+            // CSS display size fits container
+            canvas.style.width = maxWidth + 'px';
+            canvas.style.height = (maxWidth * (viewport.height / viewport.width)) + 'px';
 
             const renderTask = page.render({canvasContext: ctx, viewport: renderViewport});
             renderTask.promise.then(function() {
