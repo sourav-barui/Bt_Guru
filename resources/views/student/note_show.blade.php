@@ -363,28 +363,35 @@
         ctx.translate(width / 2, height / 2);
         ctx.rotate(-Math.PI / 5);
 
-        const fontSize = Math.max(11, Math.floor(width / 22));
-        ctx.fillStyle = 'rgba(128, 128, 128, 0.10)';
+        const fontSize = Math.max(12, Math.floor(width / 18));
+
+        // Shadow for better contrast on any background
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+        ctx.shadowBlur = 4;
+        ctx.shadowOffsetX = 1;
+        ctx.shadowOffsetY = 1;
+
+        ctx.fillStyle = 'rgba(100, 100, 100, 0.22)';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
-        const lineGap = fontSize * 1.1;
+        const lineGap = fontSize * 1.15;
 
         // Line 1: Tenant name (bold, largest)
         ctx.font = 'bold ' + fontSize + 'px sans-serif';
         ctx.fillText(tenantName, 0, -lineGap * 1.5);
 
-        // Line 2: Tenant URL (smaller)
-        ctx.font = 'normal ' + Math.floor(fontSize * 0.7) + 'px sans-serif';
-        ctx.fillText(tenantUrl, 0, -lineGap * 0.3);
+        // Line 2: Tenant URL
+        ctx.font = 'normal ' + Math.floor(fontSize * 0.72) + 'px sans-serif';
+        ctx.fillText(tenantUrl, 0, -lineGap * 0.25);
 
         // Line 3: Student name
-        ctx.font = 'bold ' + Math.floor(fontSize * 0.85) + 'px sans-serif';
-        ctx.fillText(studentName, 0, lineGap * 1.0);
+        ctx.font = 'bold ' + Math.floor(fontSize * 0.88) + 'px sans-serif';
+        ctx.fillText(studentName, 0, lineGap * 1.1);
 
         // Line 4: Student phone
-        ctx.font = 'normal ' + Math.floor(fontSize * 0.7) + 'px sans-serif';
-        ctx.fillText(studentPhone, 0, lineGap * 2.1);
+        ctx.font = 'normal ' + Math.floor(fontSize * 0.72) + 'px sans-serif';
+        ctx.fillText(studentPhone, 0, lineGap * 2.2);
 
         ctx.restore();
     }
