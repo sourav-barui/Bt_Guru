@@ -187,16 +187,22 @@
     <!-- PWA Bottom Controls -->
     <div id="pwaControls" style="display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.9);backdrop-filter:blur(10px);padding:8px 12px;z-index:200;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.1);gap:8px;">
         <div style="display:flex;align-items:center;gap:4px;">
-            <button onclick="pdfZoomOut()" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:6px 10px;border-radius:6px;font-size:16px;font-weight:bold;">-</button>
+            <button onclick="pdfZoomOut()" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:8px;border-radius:8px;display:flex;align-items:center;">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"/></svg>
+            </button>
             <span id="pdfZoomLevel" style="color:white;font-size:12px;min-width:36px;text-align:center;">100%</span>
-            <button onclick="pdfZoomIn()" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:6px 10px;border-radius:6px;font-size:16px;font-weight:bold;">+</button>
+            <button onclick="pdfZoomIn()" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:8px;border-radius:8px;display:flex;align-items:center;">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m0 0v6m0-6h6m-6 0H4"/></svg>
+            </button>
         </div>
         <div style="display:flex;align-items:center;gap:12px;">
             <button onclick="pdfPrevPage()" id="btnPrev" style="background:none;border:none;color:white;padding:8px;opacity:0.4;transition:opacity 0.2s;"><svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
             <span id="pdfPageNum" style="color:white;font-size:13px;font-weight:600;letter-spacing:1px;min-width:50px;text-align:center;">1 / 1</span>
             <button onclick="pdfNextPage()" id="btnNext" style="background:none;border:none;color:white;padding:8px;opacity:1;transition:opacity 0.2s;"><svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
         </div>
-        <button onclick="resetZoom()" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:6px 10px;border-radius:6px;font-size:12px;">Fit</button>
+        <button onclick="resetZoom()" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:8px;border-radius:8px;display:flex;align-items:center;" title="Fit to screen">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+        </button>
     </div>
 
     <!-- First-use swipe hint overlay -->
