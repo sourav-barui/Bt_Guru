@@ -125,18 +125,6 @@ Add to `C:\xampp\apache\conf\extra\httpd-vhosts.conf`:
 
 Restart Apache after configuration.
 
-## Demo Credentials
-
-### Super Admin
-- URL: `http://admin.btguru.test/login`
-- Email: `admin@btguru.in`
-- Password: `SuperAdmin@123`
-
-### Demo Tenant
-- URL: `http://futureacademy.btguru.test/login`
-- Tenant Admin: `admin@futureacademy.com` / `TenantAdmin@123`
-- Teachers: `sarah@futureacademy.com`, `michael@futureacademy.com`, `priya@futureacademy.com` / `Teacher@123`
-- Students: `rahul@email.com`, `emma@email.com`, etc. / `Student@123`
 
 ## URL Structure
 
@@ -232,9 +220,3 @@ This project is proprietary software. All rights reserved.
 For support and inquiries, contact: support@btguru.in
 Then access your platform:
 
-URL	Role	Credentials
-http://btguru.test	Landing Page	-
-http://admin.btguru.test/login	Super Admin	admin@btguru.in / SuperAdmin@123
-http://futureacademy.btguru.test/login	Tenant Admin	admin@futureacademy.com / TenantAdmin@123
-http://futureacademy.btguru.test/login	Teacher	sarah@futureacademy.com / Teacher@123
-http://futureacademy.btguru.test/student/login	Student	rahul@email.com / Student@123
