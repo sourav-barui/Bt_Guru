@@ -890,11 +890,16 @@
             }
             deferredPrompt = null;
         } else if (isIOS()) {
-            // iOS - show hint
+            // iOS Safari - cannot programmatically install; show clear instructions
+            alert('To install this app on iPhone/iPad:\n\n1. Tap the Share button (rectangle with arrow) at the bottom of Safari\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top right\n\nThe app will then appear on your home screen!');
             showIosHint();
         } else {
-            // Other browsers - show instructions
-            showInstructionsModal();
+            // Android non-Chrome or other browsers
+            if (/Android/.test(navigator.userAgent)) {
+                alert('To install this app:\n\n1. Open this page in Google Chrome browser\n2. Tap the menu (3 dots) → "Add to Home screen"\n3. Tap "Install"\n\nOr use Chrome to get the one-tap install prompt.');
+            } else {
+                showInstructionsModal();
+            }
         }
     }
 
