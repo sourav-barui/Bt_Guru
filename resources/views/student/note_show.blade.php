@@ -185,7 +185,7 @@
     </div>
 
     <!-- PWA Bottom Controls -->
-    <div id="pwaControls" style="display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.9);backdrop-filter:blur(10px);padding:8px 12px;z-index:200;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.1);gap:8px;">
+    <div id="pwaControls" style="position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.9);backdrop-filter:blur(10px);padding:8px 12px;z-index:200;display:none;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.1);gap:8px;">
         <div style="display:flex;align-items:center;gap:4px;">
             <button onclick="pdfZoomOut()" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:8px;border-radius:8px;display:flex;align-items:center;">
                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"/></svg>
