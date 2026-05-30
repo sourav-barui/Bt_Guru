@@ -289,19 +289,36 @@
     }
 
     function loadPdf(url) {
+        // Try direct load first
         pdfjsLib.getDocument({url: url, withCredentials: true}).promise.then(function(doc) {
-            pdfDoc = doc;
-            totalPages = doc.numPages;
-            document.getElementById('pdfLoading').style.display = 'none';
-            document.getElementById('singlePageContainer').style.display = 'flex';
-            document.getElementById('tapLeft').style.display = 'block';
-            document.getElementById('tapRight').style.display = 'block';
-            updatePageNum();
-            renderCurrentPage();
+            onPdfLoaded(doc);
         }).catch(function(err) {
-            console.error('PDF load error:', err);
-            showPdfError();
+            console.warn('Direct PDF load failed, trying fetch fallback:', err);
+            // Fallback: fetch via XHR then load from blob
+            fetch(url, {credentials: 'include'}).then(function(res) {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.arrayBuffer();
+            }).then(function(buffer) {
+                const typedArray = new Uint8Array(buffer);
+                pdfjsLib.getDocument({data: typedArray}).promise.then(function(doc) {
+                    onPdfLoaded(doc);
+                });
+            }).catch(function(err2) {
+                console.error('Fetch fallback also failed:', err2);
+                showPdfError();
+            });
         });
+    }
+
+    function onPdfLoaded(doc) {
+        pdfDoc = doc;
+        totalPages = doc.numPages;
+        document.getElementById('pdfLoading').style.display = 'none';
+        document.getElementById('singlePageContainer').style.display = 'flex';
+        document.getElementById('tapLeft').style.display = 'block';
+        document.getElementById('tapRight').style.display = 'block';
+        updatePageNum();
+        renderCurrentPage();
     }
 
     function showPdfError() {
