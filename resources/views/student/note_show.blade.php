@@ -211,11 +211,17 @@
             <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="opacity:0.6;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
                 <svg width="64" height="64" fill="none" stroke="white" viewBox="0 0 24 24" style="opacity:0.9;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"/></svg>
-                <span style="font-size:16px;font-weight:600;">Swipe left / right to change pages</span>
-                <span style="font-size:13px;opacity:0.7;">Pinch to zoom • Double-tap to reset</span>
+                <span style="font-size:16px;font-weight:600;">Swipe or use arrows to change pages</span>
+                <span style="font-size:13px;opacity:0.7;">Scroll to zoom • Drag thumbnail to pan</span>
             </div>
             <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="opacity:0.6;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         </div>
+    </div>
+
+    <!-- Thumbnail navigator (shows when zoomed in) -->
+    <div id="thumbNav" style="display:none;position:fixed;bottom:80px;right:12px;width:100px;height:140px;background:rgba(0,0,0,0.85);border:1px solid rgba(255,255,255,0.2);border-radius:8px;overflow:hidden;z-index:210;">
+        <canvas id="thumbCanvas" style="width:100%;height:100%;"></canvas>
+        <div id="thumbViewport" style="position:absolute;border:2px solid #3b82f6;background:rgba(59,130,246,0.15);border-radius:2px;cursor:grab;"></div>
     </div>
 
     <!-- Tap zones for page navigation -->
@@ -416,10 +422,13 @@
             const ctx = canvas.getContext('2d');
             canvas.width = renderViewport.width;
             canvas.height = renderViewport.height;
+            canvasW = renderViewport.width;
+            canvasH = renderViewport.height;
 
             const renderTask = page.render({canvasContext: ctx, viewport: renderViewport});
             renderTask.promise.then(function() {
                 drawWatermark(ctx, canvas.width, canvas.height);
+                renderThumbnail();
             });
         });
     }
@@ -451,12 +460,16 @@
     let cssZoom = 1.0;
     let panX = 0;
     let panY = 0;
+    let canvasW = 0;
+    let canvasH = 0;
 
     function applyTransform() {
         const canvas = document.getElementById('currentPageCanvas');
         canvas.style.transform = 'translate(' + panX + 'px,' + panY + 'px) scale(' + cssZoom + ')';
         canvas.style.transformOrigin = 'center center';
         document.getElementById('pdfZoomLevel').textContent = Math.round(cssZoom * 100) + '%';
+        updateThumbViewport();
+        toggleThumbNav();
     }
 
     function pdfZoomIn() {
@@ -478,12 +491,95 @@
         applyTransform();
     }
 
+    // ===== Mouse wheel zoom (desktop) =====
+    document.addEventListener('wheel', function(e) {
+        if (e.ctrlKey || e.metaKey) return; // Let browser handle ctrl+wheel
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -0.15 : 0.15;
+        const newZoom = Math.min(3.0, Math.max(0.5, cssZoom + delta));
+        if (newZoom !== cssZoom) {
+            cssZoom = newZoom;
+            applyTransform();
+        }
+    }, {passive: false});
+
+    // ===== Thumbnail Navigator =====
+    function toggleThumbNav() {
+        const nav = document.getElementById('thumbNav');
+        if (cssZoom > 1.05) {
+            nav.style.display = 'block';
+            renderThumbnail();
+        } else {
+            nav.style.display = 'none';
+        }
+    }
+
+    function renderThumbnail() {
+        const canvas = document.getElementById('currentPageCanvas');
+        const thumbCanvas = document.getElementById('thumbCanvas');
+        const thumbCtx = thumbCanvas.getContext('2d');
+        thumbCanvas.width = 100;
+        thumbCanvas.height = 140;
+        thumbCtx.clearRect(0, 0, 100, 140);
+        if (canvas.width && canvas.height) {
+            const scale = Math.min(100 / canvas.width, 140 / canvas.height);
+            const dw = canvas.width * scale;
+            const dh = canvas.height * scale;
+            thumbCtx.drawImage(canvas, (100 - dw) / 2, (140 - dh) / 2, dw, dh);
+        }
+        updateThumbViewport();
+    }
+
+    function updateThumbViewport() {
+        const vp = document.getElementById('thumbViewport');
+        if (cssZoom <= 1.05) { vp.style.display = 'none'; return; }
+        vp.style.display = 'block';
+        const container = document.getElementById('singlePageContainer');
+        const thumbW = 100;
+        const thumbH = 140;
+        const ratioX = thumbW / (canvasW * cssZoom);
+        const ratioY = thumbH / (canvasH * cssZoom);
+        const vw = thumbW * ratioX * (container.clientWidth / canvasW);
+        const vh = thumbH * ratioY * (container.clientHeight / canvasH);
+        const vx = (thumbW - vw) / 2 - panX * ratioX;
+        const vy = (thumbH - vh) / 2 - panY * ratioY;
+        vp.style.width = Math.max(8, vw) + 'px';
+        vp.style.height = Math.max(8, vh) + 'px';
+        vp.style.left = Math.max(0, Math.min(thumbW - vw, vx)) + 'px';
+        vp.style.top = Math.max(0, Math.min(thumbH - vh, vy)) + 'px';
+    }
+
+    // Thumbnail drag to pan
+    let thumbDragging = false;
+    let thumbStart = { x: 0, y: 0, panX: 0, panY: 0 };
+    const thumbVp = document.getElementById('thumbViewport');
+    thumbVp.addEventListener('mousedown', function(e) {
+        thumbDragging = true;
+        thumbStart.x = e.clientX;
+        thumbStart.y = e.clientY;
+        thumbStart.panX = panX;
+        thumbStart.panY = panY;
+        thumbVp.style.cursor = 'grabbing';
+        e.preventDefault();
+    });
+    document.addEventListener('mousemove', function(e) {
+        if (!thumbDragging) return;
+        const dx = (e.clientX - thumbStart.x) * (canvasW * cssZoom / 100);
+        const dy = (e.clientY - thumbStart.y) * (canvasH * cssZoom / 140);
+        panX = thumbStart.panX - dx;
+        panY = thumbStart.panY - dy;
+        applyTransform();
+    });
+    document.addEventListener('mouseup', function() {
+        thumbDragging = false;
+        thumbVp.style.cursor = 'grab';
+    });
+
     // ===== Touch handling: pinch-zoom + swipe + pan =====
     let touchState = { x: 0, y: 0, startX: 0, startY: 0, startDist: 0, isPinching: false, isPanning: false };
 
     document.addEventListener('touchstart', function(e) {
         if (e.touches.length === 2) {
-            // Pinch start
             touchState.isPinching = true;
             touchState.startDist = Math.hypot(
                 e.touches[0].clientX - e.touches[1].clientX,
@@ -491,7 +587,6 @@
             );
             touchState.startZoom = cssZoom;
         } else if (e.touches.length === 1) {
-            // Single touch: swipe or pan
             touchState.startX = e.touches[0].clientX;
             touchState.startY = e.touches[0].clientY;
             touchState.x = e.touches[0].clientX;
@@ -531,7 +626,6 @@
             touchState.isPanning = false;
             return;
         }
-        // Swipe detection
         if (e.changedTouches.length === 1) {
             const dx = e.changedTouches[0].clientX - touchState.startX;
             const dy = e.changedTouches[0].clientY - touchState.startY;
@@ -550,7 +644,6 @@
     document.addEventListener('touchend', function(e) {
         const now = new Date().getTime();
         if (now - lastTapTime < 300) {
-            // Double tap
             resetZoom();
         }
         lastTapTime = now;
