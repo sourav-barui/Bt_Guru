@@ -185,64 +185,83 @@ class RegisterController extends Controller
             return back()->withErrors(['otp' => 'Invalid or expired OTP. Please try again.']);
         }
 
-        // ── Create Tenant ──────────────────────────
-        $tenant = Tenant::create([
-            'coaching_name' => $reg->get('coaching_name'),
-            'slug'          => Str::slug($reg->get('coaching_name')),
-            'subdomain'     => $reg->get('subdomain'),
-            'email'         => $reg->get('email'),
-            'phone'         => $reg->get('phone'),
-            'address'       => trim(implode(', ', array_filter([
-                $reg->get('address'),
-                $reg->get('city'),
-                $reg->get('state'),
-                $reg->get('pincode'),
-            ]))),
-            'status'        => 'pending',
-            'settings'      => [
-                'tagline'       => $reg->get('tagline'),
-                'website'       => $reg->get('website'),
-                'coaching_type' => $reg->get('coaching_type'),
-                'phone_alt'     => $reg->get('phone_alt'),
-                'city'          => $reg->get('city'),
-                'state'         => $reg->get('state'),
-                'pincode'       => $reg->get('pincode'),
-            ],
-        ]);
-
-        // ── Create Admin User ──────────────────────
-        $admin = User::create([
-            'tenant_id'         => $tenant->id,
-            'name'              => $reg->get('admin_name'),
-            'email'             => $reg->get('admin_email'),
-            'phone'             => $reg->get('admin_phone'),
-            'password'          => $reg->get('password'),
-            'status'            => 'active',
-            'email_verified_at' => now(),
-        ]);
-        $admin->assignRole('tenant_admin');
-
-        // ── Send welcome email ─────────────────────
-        [$fromAddr, $fromName] = $this->applySystemMailConfig();
         try {
-            Mail::send([], [], function (Message $msg) use ($admin, $tenant, $fromAddr, $fromName) {
-                $msg->to($admin->email, $admin->name)
-                    ->from($fromAddr, $fromName)
-                    ->subject('Welcome to BT Guru – ' . $tenant->coaching_name)
-                    ->html(view('emails.registration_welcome', [
-                        'admin'  => $admin,
-                        'tenant' => $tenant,
-                    ])->render());
-            });
+            // ── Validate required data exists ──────────
+            $required = ['coaching_name', 'subdomain', 'email', 'admin_name', 'admin_email', 'admin_phone', 'password'];
+            foreach ($required as $key) {
+                if (empty($reg->get($key))) {
+                    return back()->withErrors(['otp' => 'Registration data is incomplete. Please start over.']);
+                }
+            }
+
+            // ── Create Tenant ──────────────────────────
+            $tenant = Tenant::create([
+                'coaching_name' => $reg->get('coaching_name'),
+                'slug'          => Str::slug($reg->get('coaching_name')),
+                'subdomain'     => $reg->get('subdomain'),
+                'email'         => $reg->get('email'),
+                'phone'         => $reg->get('phone'),
+                'address'       => trim(implode(', ', array_filter([
+                    $reg->get('address'),
+                    $reg->get('city'),
+                    $reg->get('state'),
+                    $reg->get('pincode'),
+                ]))),
+                'status'        => 'pending',
+                'settings'      => [
+                    'tagline'       => $reg->get('tagline'),
+                    'website'       => $reg->get('website'),
+                    'coaching_type' => $reg->get('coaching_type'),
+                    'phone_alt'     => $reg->get('phone_alt'),
+                    'city'          => $reg->get('city'),
+                    'state'         => $reg->get('state'),
+                    'pincode'       => $reg->get('pincode'),
+                ],
+            ]);
+
+            // ── Create Admin User ──────────────────────
+            // Password is already hashed in registration data; bypass the hashed cast
+            $admin = new User([
+                'tenant_id'         => $tenant->id,
+                'name'              => $reg->get('admin_name'),
+                'email'             => $reg->get('admin_email'),
+                'phone'             => $reg->get('admin_phone'),
+                'status'            => 'active',
+                'email_verified_at' => now(),
+            ]);
+            $admin->password = $reg->get('password'); // bypass cast
+            $admin->save();
+            $admin->assignRole('tenant_admin');
+
+            // ── Send welcome email ─────────────────────
+            [$fromAddr, $fromName] = $this->applySystemMailConfig();
+            try {
+                Mail::send([], [], function (Message $msg) use ($admin, $tenant, $fromAddr, $fromName) {
+                    $msg->to($admin->email, $admin->name)
+                        ->from($fromAddr, $fromName)
+                        ->subject('Welcome to BT Guru – ' . $tenant->coaching_name)
+                        ->html(view('emails.registration_welcome', [
+                            'admin'  => $admin,
+                            'tenant' => $tenant,
+                        ])->render());
+                });
+            } catch (\Throwable $e) {
+                \Log::warning('Welcome email failed: ' . $e->getMessage());
+            }
+
+            // ── Cleanup ────────────────────────────────
+            $reg->delete();
+
+            return redirect()->route('home')
+                ->with('success', 'Registration complete! Your coaching centre is under review. You will receive an email once activated.');
         } catch (\Throwable $e) {
-            \Log::warning('Welcome email failed: ' . $e->getMessage());
+            \Log::error('Tenant registration verify failed: ' . $e->getMessage(), [
+                'file'  => $e->getFile(),
+                'line'  => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return back()->withErrors(['otp' => 'Something went wrong: ' . $e->getMessage() . '. Please contact support.']);
         }
-
-        // ── Cleanup ────────────────────────────────
-        $reg->delete();
-
-        return redirect()->route('home')
-            ->with('success', 'Registration complete! Your coaching centre is under review. You will receive an email once activated.');
     }
 
     // Resend OTP
