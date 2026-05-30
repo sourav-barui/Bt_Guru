@@ -53,7 +53,7 @@
                         Change your password to logout from all devices and secure your account.
                     </p>
 
-                    <form method="POST" action="{{ route('student.password.send') }}">
+                    <form method="POST" action="{{ route('student.password.otp.send') }}">
                         @csrf
                         <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
                             <svg class="w-4 h-4 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
