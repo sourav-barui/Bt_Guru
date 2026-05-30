@@ -111,6 +111,11 @@
         from { transform: rotate(0deg); }
         to { transform: rotate(360deg); }
     }
+    @keyframes fadeOut {
+        0% { opacity: 1; visibility: visible; }
+        80% { opacity: 1; visibility: visible; }
+        100% { opacity: 0; visibility: hidden; }
+    }
 </style>
 
 <div class="header-toggle" onclick="toggleHeader()"></div>
@@ -180,10 +185,31 @@
     </div>
 
     <!-- PWA Bottom Controls -->
-    <div id="pwaControls" style="display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.9);backdrop-filter:blur(10px);padding:10px 16px;z-index:200;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.1);">
-        <button onclick="pdfPrevPage()" id="btnPrev" style="background:none;border:none;color:white;padding:10px;opacity:0.4;transition:opacity 0.2s;"><svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
-        <span id="pdfPageNum" style="color:white;font-size:14px;font-weight:600;letter-spacing:1px;">1 / 1</span>
-        <button onclick="pdfNextPage()" id="btnNext" style="background:none;border:none;color:white;padding:10px;opacity:1;transition:opacity 0.2s;"><svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
+    <div id="pwaControls" style="display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.9);backdrop-filter:blur(10px);padding:8px 12px;z-index:200;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.1);gap:8px;">
+        <div style="display:flex;align-items:center;gap:4px;">
+            <button onclick="pdfZoomOut()" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:6px 10px;border-radius:6px;font-size:16px;font-weight:bold;">-</button>
+            <span id="pdfZoomLevel" style="color:white;font-size:12px;min-width:36px;text-align:center;">100%</span>
+            <button onclick="pdfZoomIn()" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:6px 10px;border-radius:6px;font-size:16px;font-weight:bold;">+</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <button onclick="pdfPrevPage()" id="btnPrev" style="background:none;border:none;color:white;padding:8px;opacity:0.4;transition:opacity 0.2s;"><svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+            <span id="pdfPageNum" style="color:white;font-size:13px;font-weight:600;letter-spacing:1px;min-width:50px;text-align:center;">1 / 1</span>
+            <button onclick="pdfNextPage()" id="btnNext" style="background:none;border:none;color:white;padding:8px;opacity:1;transition:opacity 0.2s;"><svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
+        </div>
+        <button onclick="resetZoom()" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:6px 10px;border-radius:6px;font-size:12px;">Fit</button>
+    </div>
+
+    <!-- First-use swipe hint overlay -->
+    <div id="swipeHint" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:250;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;text-align:center;padding:24px;animation:fadeOut 3s forwards;animation-delay:2s;">
+        <div style="display:flex;align-items:center;gap:40px;color:white;">
+            <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="opacity:0.6;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+                <svg width="64" height="64" fill="none" stroke="white" viewBox="0 0 24 24" style="opacity:0.9;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"/></svg>
+                <span style="font-size:16px;font-weight:600;">Swipe left / right to change pages</span>
+                <span style="font-size:13px;opacity:0.7;">Pinch to zoom • Double-tap to reset</span>
+            </div>
+            <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="opacity:0.6;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
     </div>
 
     <!-- Tap zones for page navigation -->
@@ -319,6 +345,7 @@
         document.getElementById('tapRight').style.display = 'block';
         updatePageNum();
         renderCurrentPage();
+        showSwipeHint();
     }
 
     function showPdfError() {
@@ -372,6 +399,7 @@
     function pdfPrevPage() {
         if (currentPage <= 1) return;
         currentPage--;
+        resetZoom();
         updatePageNum();
         renderCurrentPage();
     }
@@ -379,33 +407,129 @@
     function pdfNextPage() {
         if (currentPage >= totalPages) return;
         currentPage++;
+        resetZoom();
         updatePageNum();
         renderCurrentPage();
     }
 
-    // Swipe support for mobile
-    let touchStartX = 0;
-    let touchEndX = 0;
+    // ===== Zoom via CSS transform (smooth on mobile) =====
+    let cssZoom = 1.0;
+    let panX = 0;
+    let panY = 0;
+
+    function applyTransform() {
+        const canvas = document.getElementById('currentPageCanvas');
+        canvas.style.transform = 'translate(' + panX + 'px,' + panY + 'px) scale(' + cssZoom + ')';
+        canvas.style.transformOrigin = 'center center';
+        document.getElementById('pdfZoomLevel').textContent = Math.round(cssZoom * 100) + '%';
+    }
+
+    function pdfZoomIn() {
+        if (cssZoom >= 3.0) return;
+        cssZoom = Math.min(3.0, cssZoom + 0.3);
+        applyTransform();
+    }
+
+    function pdfZoomOut() {
+        if (cssZoom <= 0.5) return;
+        cssZoom = Math.max(0.5, cssZoom - 0.3);
+        applyTransform();
+    }
+
+    function resetZoom() {
+        cssZoom = 1.0;
+        panX = 0;
+        panY = 0;
+        applyTransform();
+    }
+
+    // ===== Touch handling: pinch-zoom + swipe + pan =====
+    let touchState = { x: 0, y: 0, startX: 0, startY: 0, startDist: 0, isPinching: false, isPanning: false };
 
     document.addEventListener('touchstart', function(e) {
-        touchStartX = e.changedTouches[0].screenX;
-    }, false);
+        if (e.touches.length === 2) {
+            // Pinch start
+            touchState.isPinching = true;
+            touchState.startDist = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+            touchState.startZoom = cssZoom;
+        } else if (e.touches.length === 1) {
+            // Single touch: swipe or pan
+            touchState.startX = e.touches[0].clientX;
+            touchState.startY = e.touches[0].clientY;
+            touchState.x = e.touches[0].clientX;
+            touchState.y = e.touches[0].clientY;
+            touchState.isPanning = cssZoom > 1.0;
+        }
+    }, {passive: false});
+
+    document.addEventListener('touchmove', function(e) {
+        if (e.touches.length === 2 && touchState.isPinching) {
+            e.preventDefault();
+            const dist = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+            const scale = dist / touchState.startDist;
+            cssZoom = Math.min(3.0, Math.max(0.5, touchState.startZoom * scale));
+            applyTransform();
+        } else if (e.touches.length === 1 && touchState.isPanning) {
+            e.preventDefault();
+            const dx = e.touches[0].clientX - touchState.x;
+            const dy = e.touches[0].clientY - touchState.y;
+            panX += dx;
+            panY += dy;
+            touchState.x = e.touches[0].clientX;
+            touchState.y = e.touches[0].clientY;
+            applyTransform();
+        }
+    }, {passive: false});
 
     document.addEventListener('touchend', function(e) {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-    }, false);
+        if (touchState.isPinching) {
+            touchState.isPinching = false;
+            return;
+        }
+        if (touchState.isPanning) {
+            touchState.isPanning = false;
+            return;
+        }
+        // Swipe detection
+        if (e.changedTouches.length === 1) {
+            const dx = e.changedTouches[0].clientX - touchState.startX;
+            const dy = e.changedTouches[0].clientY - touchState.startY;
+            if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 60) {
+                if (dx < 0) {
+                    pdfNextPage();
+                } else {
+                    pdfPrevPage();
+                }
+            }
+        }
+    }, {passive: false});
 
-    function handleSwipe() {
-        const swipeThreshold = 50;
-        if (touchEndX < touchStartX - swipeThreshold) {
-            // Swipe left - next page
-            pdfNextPage();
+    // Double-tap to reset zoom
+    let lastTapTime = 0;
+    document.addEventListener('touchend', function(e) {
+        const now = new Date().getTime();
+        if (now - lastTapTime < 300) {
+            // Double tap
+            resetZoom();
         }
-        if (touchEndX > touchStartX + swipeThreshold) {
-            // Swipe right - prev page
-            pdfPrevPage();
-        }
+        lastTapTime = now;
+    });
+
+    // ===== Show hint on first view (once per session) =====
+    function showSwipeHint() {
+        if (sessionStorage.getItem('pdfHintShown')) return;
+        const hint = document.getElementById('swipeHint');
+        hint.style.display = 'flex';
+        sessionStorage.setItem('pdfHintShown', 'true');
+        setTimeout(function() {
+            hint.style.display = 'none';
+        }, 5000);
     }
 
     // Initialize
