@@ -26,6 +26,12 @@
                     </div>
                 @endif
 
+                @if($currentSubscription && $currentSubscription->plan_id == $plan->id && $currentSubscription->isActive())
+                    <div class="bg-green-600 text-white text-center py-2 text-sm font-semibold">
+                        Subscribed
+                    </div>
+                @endif
+
                 <div class="p-6">
                     <h3 class="text-xl font-bold text-gray-900">{{ $plan->name }}</h3>
                     <p class="text-gray-500 text-sm mt-1">{{ $plan->description }}</p>
@@ -67,9 +73,15 @@
                                    placeholder="Coupon code (optional)">
                         </div>
 
-                        <button type="submit" class="w-full btn-primary {{ $plan->is_popular ? 'bg-purple-600 hover:bg-purple-700' : '' }}">
-                            {{ $plan->trial_days > 0 ? 'Start Free Trial' : 'Subscribe Now' }}
-                        </button>
+                        @if($currentSubscription && $currentSubscription->plan_id == $plan->id && $currentSubscription->isActive())
+                            <button type="button" disabled class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold cursor-not-allowed opacity-90">
+                                Subscribed
+                            </button>
+                        @else
+                            <button type="submit" class="w-full btn-primary {{ $plan->is_popular ? 'bg-purple-600 hover:bg-purple-700' : '' }}">
+                                {{ $plan->trial_days > 0 ? 'Start Free Trial' : 'Subscribe Now' }}
+                            </button>
+                        @endif
                     </form>
                 </div>
             </div>
