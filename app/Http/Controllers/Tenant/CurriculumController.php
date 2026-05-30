@@ -346,7 +346,13 @@ class CurriculumController extends Controller
 
     public function destroyNote(CurriculumNote $note)
     {
-        Storage::disk('public')->delete($note->file_path);
+        try {
+            if ($note->file_path && Storage::disk('public')->exists($note->file_path)) {
+                Storage::disk('public')->delete($note->file_path);
+            }
+        } catch (\Exception $e) {
+            // File may not exist - continue to delete DB record
+        }
         $note->delete();
         return back()->with('success', 'Note removed successfully.');
     }

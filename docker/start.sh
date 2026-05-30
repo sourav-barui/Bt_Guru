@@ -11,8 +11,9 @@ php artisan config:cache
 php artisan view:cache
 php artisan event:cache
 
-# Storage link
-php artisan storage:link || true
+# Storage link - force recreate to ensure symlink is valid after redeploy
+rm -f public/storage
+php artisan storage:link --force || true
 
 # Run migrations (optional — remove if you prefer manual)
 php artisan migrate --force || true
