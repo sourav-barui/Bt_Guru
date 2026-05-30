@@ -416,14 +416,24 @@
             const maxWidth = container.clientWidth - 32;
             const maxHeight = container.clientHeight - 32;
             const viewport = page.getViewport({scale: 1});
-            const scale = Math.min(maxWidth / viewport.width, maxHeight / viewport.height, 2);
+            const fitScale = Math.min(maxWidth / viewport.width, maxHeight / viewport.height, 3);
 
-            const renderViewport = page.getViewport({scale: scale});
+            // Use device pixel ratio for crisp rendering (2x or 3x on Retina/mobile)
+            const dpr = Math.min(window.devicePixelRatio || 1, 3);
+            const renderScale = fitScale * dpr;
+
+            const renderViewport = page.getViewport({scale: renderScale});
             const ctx = canvas.getContext('2d');
+
+            // High-res canvas backing store
             canvas.width = renderViewport.width;
             canvas.height = renderViewport.height;
             canvasW = renderViewport.width;
             canvasH = renderViewport.height;
+
+            // Display size fits container (CSS pixels)
+            canvas.style.width = (renderViewport.width / dpr) + 'px';
+            canvas.style.height = (renderViewport.height / dpr) + 'px';
 
             const renderTask = page.render({canvasContext: ctx, viewport: renderViewport});
             renderTask.promise.then(function() {
