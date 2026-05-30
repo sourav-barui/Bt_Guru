@@ -338,7 +338,7 @@ class CurriculumController extends Controller
         return back()->with('success', 'Note added successfully.');
     }
 
-    public function destroyContent(CurriculumContent $content)
+    public function destroyContent(Course $course, CurriculumContent $content)
     {
         $content->delete();
         return back()->with('success', 'Content removed successfully.');
