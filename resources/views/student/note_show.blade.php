@@ -107,9 +107,12 @@
         cursor: pointer;
         border: none;
     }
-    /* Mobile: hide bottom nav bar, show page counter in top bar */
+    /* Mobile: hide bottom nav bar & desktop header nav, show page counter in top bar */
     @media (max-width: 768px) {
         #pwaControls {
+            display: none !important;
+        }
+        #desktopPageNav {
             display: none !important;
         }
         #mobilePageCounter {
@@ -147,6 +150,15 @@
                 📄 {{ $note->file_size_formatted }}
                 <span id="mobilePageCounter" style="display:none;margin-left:8px;background:rgba(255,255,255,0.25);padding:2px 8px;border-radius:10px;font-weight:600;">Page 1 / 1</span>
             </p>
+            <!-- Desktop page nav row -->
+            <div id="desktopPageNav" style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+                <button onclick="pdfPrevPage()" id="headerPrev" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:4px 8px;border-radius:6px;font-size:14px;cursor:pointer;line-height:1;">&lt;</button>
+                <span id="headerPageNum" style="font-size:13px;font-weight:600;min-width:60px;text-align:center;">1 / 1</span>
+                <button onclick="pdfNextPage()" id="headerNext" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:4px 8px;border-radius:6px;font-size:14px;cursor:pointer;line-height:1;">&gt;</button>
+                <span style="opacity:0.6;font-size:11px;">|</span>
+                <label style="font-size:11px;opacity:0.9;">Jump:</label>
+                <input type="number" id="jumpPageInput" min="1" placeholder="#" style="width:42px;padding:3px 6px;border-radius:4px;border:none;font-size:12px;text-align:center;background:rgba(255,255,255,0.9);color:#1a1a2e;" onkeydown="if(event.key==='Enter'){jumpToPage(this.value)}">
+            </div>
         </div>
         <div class="flex items-center gap-2">
             @if($note->is_downloadable)
@@ -501,9 +513,20 @@
         // Update mobile counter in top bar
         const mobileCounter = document.getElementById('mobilePageCounter');
         if (mobileCounter) mobileCounter.textContent = 'Page ' + pageText;
-        // Update button opacity
+        // Update desktop header counter
+        const headerNum = document.getElementById('headerPageNum');
+        if (headerNum) headerNum.textContent = pageText;
+        // Update button opacity (bottom nav)
         document.getElementById('btnPrev').style.opacity = currentPage <= 1 ? '0.3' : '1';
         document.getElementById('btnNext').style.opacity = currentPage >= totalPages ? '0.3' : '1';
+        // Update header button opacity
+        const headerPrev = document.getElementById('headerPrev');
+        const headerNext = document.getElementById('headerNext');
+        if (headerPrev) headerPrev.style.opacity = currentPage <= 1 ? '0.3' : '1';
+        if (headerNext) headerNext.style.opacity = currentPage >= totalPages ? '0.3' : '1';
+        // Update jump input max
+        const jumpInput = document.getElementById('jumpPageInput');
+        if (jumpInput) jumpInput.max = totalPages;
     }
 
     function pdfPrevPage() {
@@ -520,6 +543,16 @@
         resetZoom();
         updatePageNum();
         renderCurrentPage();
+    }
+
+    function jumpToPage(val) {
+        const num = parseInt(val, 10);
+        if (!num || num < 1 || num > totalPages) return;
+        currentPage = num;
+        resetZoom();
+        updatePageNum();
+        renderCurrentPage();
+        document.getElementById('jumpPageInput').value = '';
     }
 
     // ===== Zoom via CSS transform (smooth on mobile) =====
