@@ -186,10 +186,13 @@
         </div>
     </div>
 
+    @php
+        $activeEnrollments = $course->enrollments->where('enrollment_status', '!=', 'dropped');
+    @endphp
     {{-- Enrolled Students Table --}}
     <div class="bg-white rounded-xl shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <h3 class="font-semibold text-gray-900">Enrolled Students ({{ $course->enrollments->count() }})</h3>
+            <h3 class="font-semibold text-gray-900">Enrolled Students ({{ $activeEnrollments->count() }})</h3>
             <a href="{{ route('tenant.enrollments.create') }}?course_id={{ $course->id }}" class="btn-primary text-sm">
                 + Enroll Student
             </a>
@@ -207,7 +210,7 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse($course->enrollments as $enrollment)
+                    @forelse($activeEnrollments as $enrollment)
                         <tr>
                             <td>
                                 <div>

@@ -61,7 +61,7 @@ class DashboardController extends Controller
     {
         $student = Auth::user();
         $enrollments = $student->enrollments()
-            ->whereIn('enrollment_status', ['active', 'pending', 'completed'])
+            ->whereIn('enrollment_status', ['active', 'pending', 'completed', 'dropped'])
             ->with(['course', 'course.teachers'])
             ->latest()
             ->paginate(10);

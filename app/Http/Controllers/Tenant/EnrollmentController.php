@@ -149,9 +149,9 @@ class EnrollmentController extends Controller
 
     public function destroy(Enrollment $enrollment)
     {
-        $enrollment->delete();
+        $enrollment->update(['enrollment_status' => 'dropped']);
         return redirect()->route('tenant.enrollments.index')
-            ->with('success', 'Enrollment deleted successfully.');
+            ->with('success', 'Student unenrolled successfully.');
     }
 
     public function approve(Enrollment $enrollment)
