@@ -107,12 +107,15 @@
         cursor: pointer;
         border: none;
     }
-    /* Mobile: hide bottom nav bar & desktop header nav, show page counter in top bar */
+    /* Mobile: hide bottom nav bar, desktop header nav, and thumbnail navigator */
     @media (max-width: 768px) {
         #pwaControls {
             display: none !important;
         }
         #desktopPageNav {
+            display: none !important;
+        }
+        #thumbNav {
             display: none !important;
         }
         #mobilePageCounter {
