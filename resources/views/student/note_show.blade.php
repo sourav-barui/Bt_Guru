@@ -354,24 +354,37 @@
     }
 
     const studentName = "{{ Auth::user()->name }}";
-    const studentPhone = "{{ Auth::user()->phone }}";
+    const studentPhone = "{{ Auth::user()->phone ?? 'N/A' }}";
+    const tenantName = "{{ $currentTenant->coaching_name ?? 'BT Guru' }}";
+    const tenantUrl = "{{ $currentTenant->custom_domain ?? ($currentTenant->subdomain . '.' . config('app.central_domain', 'btguru.tech')) }}";
 
     function drawWatermark(ctx, width, height) {
         ctx.save();
         ctx.translate(width / 2, height / 2);
         ctx.rotate(-Math.PI / 5);
 
-        const fontSize = Math.max(12, Math.floor(width / 18));
-        ctx.font = 'bold ' + fontSize + 'px sans-serif';
-        ctx.fillStyle = 'rgba(128, 128, 128, 0.12)';
+        const fontSize = Math.max(11, Math.floor(width / 22));
+        ctx.fillStyle = 'rgba(128, 128, 128, 0.10)';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
-        // Draw name
-        ctx.fillText(studentName, 0, -fontSize * 0.6);
-        // Draw phone below
-        ctx.font = 'normal ' + Math.floor(fontSize * 0.75) + 'px sans-serif';
-        ctx.fillText(studentPhone, 0, fontSize * 0.8);
+        const lineGap = fontSize * 1.1;
+
+        // Line 1: Tenant name (bold, largest)
+        ctx.font = 'bold ' + fontSize + 'px sans-serif';
+        ctx.fillText(tenantName, 0, -lineGap * 1.5);
+
+        // Line 2: Tenant URL (smaller)
+        ctx.font = 'normal ' + Math.floor(fontSize * 0.7) + 'px sans-serif';
+        ctx.fillText(tenantUrl, 0, -lineGap * 0.3);
+
+        // Line 3: Student name
+        ctx.font = 'bold ' + Math.floor(fontSize * 0.85) + 'px sans-serif';
+        ctx.fillText(studentName, 0, lineGap * 1.0);
+
+        // Line 4: Student phone
+        ctx.font = 'normal ' + Math.floor(fontSize * 0.7) + 'px sans-serif';
+        ctx.fillText(studentPhone, 0, lineGap * 2.1);
 
         ctx.restore();
     }
