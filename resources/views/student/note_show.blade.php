@@ -434,12 +434,24 @@
             const maxWidth = container.clientWidth - 32;
             const maxHeight = container.clientHeight - 32;
             const viewport = page.getViewport({scale: 1});
+            const pageRatio = viewport.width / viewport.height;
+            const containerRatio = maxWidth / maxHeight;
 
-            // Scale to fit screen
-            const fitScale = Math.min(maxWidth / viewport.width, maxHeight / viewport.height);
-            // Ensure minimum high quality (scale 2.0) for crisp images, cap at 5.0
+            // Fit to container while maintaining exact aspect ratio
+            let displayWidth, displayHeight;
+            if (pageRatio > containerRatio) {
+                // Page is wider than container: fit to width
+                displayWidth = maxWidth;
+                displayHeight = maxWidth / pageRatio;
+            } else {
+                // Page is taller than container: fit to height
+                displayHeight = maxHeight;
+                displayWidth = maxHeight * pageRatio;
+            }
+
+            // Render at high resolution for crisp images
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            const renderScale = Math.min(5.0, Math.max(2.0, fitScale * dpr));
+            const renderScale = Math.min(5.0, Math.max(2.0, (displayWidth / viewport.width) * dpr));
 
             const renderViewport = page.getViewport({scale: renderScale});
             const ctx = canvas.getContext('2d');
@@ -449,9 +461,11 @@
             canvasW = renderViewport.width;
             canvasH = renderViewport.height;
 
-            // CSS display size fits container
-            canvas.style.width = maxWidth + 'px';
-            canvas.style.height = (maxWidth * (viewport.height / viewport.width)) + 'px';
+            // CSS display size maintains exact PDF aspect ratio
+            canvas.style.width = displayWidth + 'px';
+            canvas.style.height = displayHeight + 'px';
+            canvas.style.maxWidth = '100%';
+            canvas.style.maxHeight = '100%';
 
             const renderTask = page.render({canvasContext: ctx, viewport: renderViewport});
             renderTask.promise.then(function() {
