@@ -20,8 +20,17 @@
                 </div>
                 
                 <div class="flex items-center gap-4">
-                    <a href="{{ route('student.login') }}" class="text-gray-600 hover:text-gray-900">Student Login</a>
-                    <a href="{{ route('tenant.login') }}" class="btn-primary">Admin/Teacher Login</a>
+                    <a href="{{ route('student.login') }}" class="p-2 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition" title="Student Login" aria-label="Student Login">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422A12.083 12.083 0 0121 14.5V21H3v-6.5a12.083 12.083 0 016.84-3.422L12 14z"></path>
+                        </svg>
+                    </a>
+                    <a href="{{ route('tenant.login') }}" class="p-2 rounded-lg text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 transition" title="Admin / Teacher Login" aria-label="Admin / Teacher Login">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                    </a>
                 </div>
             </div>
         </div>
