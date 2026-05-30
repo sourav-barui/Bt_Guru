@@ -491,17 +491,47 @@
         applyTransform();
     }
 
-    // ===== Mouse wheel zoom (desktop) =====
-    document.addEventListener('wheel', function(e) {
-        if (e.ctrlKey || e.metaKey) return; // Let browser handle ctrl+wheel
+    // ===== Mouse wheel zoom (desktop, only over PDF) =====
+    document.getElementById('pdfContainer').addEventListener('wheel', function(e) {
+        if (e.ctrlKey || e.metaKey) return;
         e.preventDefault();
-        const delta = e.deltaY > 0 ? -0.15 : 0.15;
+        const delta = e.deltaY > 0 ? -0.2 : 0.2;
         const newZoom = Math.min(3.0, Math.max(0.5, cssZoom + delta));
         if (newZoom !== cssZoom) {
             cssZoom = newZoom;
             applyTransform();
         }
     }, {passive: false});
+
+    // ===== Mouse drag to pan (desktop) =====
+    let isMouseDragging = false;
+    let mouseStart = { x: 0, y: 0, panX: 0, panY: 0 };
+    const pdfContainer = document.getElementById('pdfContainer');
+
+    pdfContainer.addEventListener('mousedown', function(e) {
+        if (e.button !== 0) return; // Only left click
+        isMouseDragging = true;
+        mouseStart.x = e.clientX;
+        mouseStart.y = e.clientY;
+        mouseStart.panX = panX;
+        mouseStart.panY = panY;
+        pdfContainer.style.cursor = 'grabbing';
+        e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (!isMouseDragging) return;
+        const dx = e.clientX - mouseStart.x;
+        const dy = e.clientY - mouseStart.y;
+        panX = mouseStart.panX + dx;
+        panY = mouseStart.panY + dy;
+        applyTransform();
+    });
+
+    document.addEventListener('mouseup', function() {
+        isMouseDragging = false;
+        pdfContainer.style.cursor = 'default';
+    });
 
     // ===== Thumbnail Navigator =====
     function toggleThumbNav() {
