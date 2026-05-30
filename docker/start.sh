@@ -3,9 +3,11 @@ set -e
 
 cd /var/www/html
 
-# Cache Laravel configs
+# Clear any stale caches
+php artisan optimize:clear || true
+
+# Cache Laravel configs (but NOT routes - conditional routing breaks route cache)
 php artisan config:cache
-php artisan route:cache
 php artisan view:cache
 php artisan event:cache
 
