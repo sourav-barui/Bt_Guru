@@ -353,17 +353,26 @@
         document.getElementById('pdfError').style.display = 'flex';
     }
 
-    const tenantName = "{{ $currentTenant->coaching_name ?? 'BT Guru' }}";
+    const studentName = "{{ Auth::user()->name }}";
+    const studentPhone = "{{ Auth::user()->phone }}";
 
     function drawWatermark(ctx, width, height) {
         ctx.save();
-        ctx.font = 'bold ' + Math.max(14, Math.floor(width / 15)) + 'px sans-serif';
-        ctx.fillStyle = 'rgba(128, 128, 128, 0.15)';
+        ctx.translate(width / 2, height / 2);
+        ctx.rotate(-Math.PI / 5);
+
+        const fontSize = Math.max(12, Math.floor(width / 18));
+        ctx.font = 'bold ' + fontSize + 'px sans-serif';
+        ctx.fillStyle = 'rgba(128, 128, 128, 0.12)';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.translate(width / 2, height / 2);
-        ctx.rotate(-Math.PI / 6);
-        ctx.fillText(tenantName, 0, 0);
+
+        // Draw name
+        ctx.fillText(studentName, 0, -fontSize * 0.6);
+        // Draw phone below
+        ctx.font = 'normal ' + Math.floor(fontSize * 0.75) + 'px sans-serif';
+        ctx.fillText(studentPhone, 0, fontSize * 0.8);
+
         ctx.restore();
     }
 
