@@ -344,7 +344,7 @@ class CurriculumController extends Controller
         return back()->with('success', 'Content removed successfully.');
     }
 
-    public function destroyNote(CurriculumNote $note)
+    public function destroyNote(Course $course, CurriculumNote $note)
     {
         try {
             // Delete file if it exists
