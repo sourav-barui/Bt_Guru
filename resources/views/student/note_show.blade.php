@@ -107,6 +107,25 @@
         cursor: pointer;
         border: none;
     }
+    /* Mobile: hide bottom nav bar, show page counter in top bar */
+    @media (max-width: 768px) {
+        #pwaControls {
+            display: none !important;
+        }
+        #mobilePageCounter {
+            display: inline-flex !important;
+        }
+        /* Give more space for PDF since bottom bar is hidden */
+        #singlePageContainer {
+            padding-bottom: 16px !important;
+        }
+    }
+    /* Desktop: hide mobile counter */
+    @media (min-width: 769px) {
+        #mobilePageCounter {
+            display: none !important;
+        }
+    }
     @keyframes spin {
         from { transform: rotate(0deg); }
         to { transform: rotate(360deg); }
@@ -126,6 +145,7 @@
             <h1 class="text-lg font-bold truncate">{{ $note->title }}</h1>
             <p class="text-xs text-emerald-100">
                 📄 {{ $note->file_size_formatted }}
+                <span id="mobilePageCounter" style="display:none;margin-left:8px;background:rgba(255,255,255,0.25);padding:2px 8px;border-radius:10px;font-weight:600;">Page 1 / 1</span>
             </p>
         </div>
         <div class="flex items-center gap-2">
@@ -476,7 +496,11 @@
     }
 
     function updatePageNum() {
-        document.getElementById('pdfPageNum').textContent = currentPage + ' / ' + totalPages;
+        const pageText = currentPage + ' / ' + totalPages;
+        document.getElementById('pdfPageNum').textContent = pageText;
+        // Update mobile counter in top bar
+        const mobileCounter = document.getElementById('mobilePageCounter');
+        if (mobileCounter) mobileCounter.textContent = 'Page ' + pageText;
         // Update button opacity
         document.getElementById('btnPrev').style.opacity = currentPage <= 1 ? '0.3' : '1';
         document.getElementById('btnNext').style.opacity = currentPage >= totalPages ? '0.3' : '1';
