@@ -32,12 +32,39 @@ class LiveClass extends Model
         'status',
         'recurrence',
         'is_public',
+        // BTLive fields
+        'is_btlive',
+        'btlive_room_name',
+        'btlive_room_password',
+        'btlive_recording_id',
+        'btlive_recording_url',
+        'btlive_recording_status',
+        'btlive_lobby_enabled',
+        'btlive_waiting_room_enabled',
+        'btlive_chat_enabled',
+        'btlive_teacher_only_video',
+        'btlive_teacher_only_audio',
+        'btlive_attendance_enabled',
+        'btlive_jwt_required',
+        'btlive_started_at',
+        'btlive_ended_at',
     ];
 
     protected $casts = [
         'scheduled_at'     => 'datetime',
         'duration_minutes' => 'integer',
         'is_public'        => 'boolean',
+        // BTLive casts
+        'is_btlive' => 'boolean',
+        'btlive_lobby_enabled' => 'boolean',
+        'btlive_waiting_room_enabled' => 'boolean',
+        'btlive_chat_enabled' => 'boolean',
+        'btlive_teacher_only_video' => 'boolean',
+        'btlive_teacher_only_audio' => 'boolean',
+        'btlive_attendance_enabled' => 'boolean',
+        'btlive_jwt_required' => 'boolean',
+        'btlive_started_at' => 'datetime',
+        'btlive_ended_at' => 'datetime',
     ];
 
     public function tenant(): BelongsTo   { return $this->belongsTo(Tenant::class); }
@@ -46,6 +73,12 @@ class LiveClass extends Model
     public function chapter(): BelongsTo  { return $this->belongsTo(Chapter::class); }
     public function lesson(): BelongsTo   { return $this->belongsTo(Lesson::class); }
     public function creator(): BelongsTo  { return $this->belongsTo(User::class, 'created_by'); }
+
+    // BTLive attendance
+    public function attendance(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\LiveClassAttendance::class)->orderBy('joined_at', 'desc');
+    }
 
     public function getLevelLabelAttribute(): string
     {

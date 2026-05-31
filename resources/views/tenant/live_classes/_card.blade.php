@@ -21,6 +21,11 @@
                 <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{ $lc->platform_color }}">
                     {{ $lc->platform_label }}
                 </span>
+                @if($lc->is_btlive)
+                    <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200">
+                        🔴 BTLive
+                    </span>
+                @endif
                 @if($lc->recurrence !== 'none')
                 <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">
                     {{ ucfirst($lc->recurrence) }}
@@ -52,11 +57,35 @@
 
     {{-- Actions --}}
     <div class="flex items-center gap-2 flex-shrink-0">
-        <a href="{{ $lc->meeting_url }}" target="_blank"
-           class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.07A1 1 0 0121 8.845v6.31a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-            Open
-        </a>
+        {{-- BTLive Room Button --}}
+        @if($lc->is_btlive)
+            <a href="{{ route('btlive.teacher_room', $lc) }}" target="_blank"
+               class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+                BTLive Room
+            </a>
+        @else
+            {{-- Convert to BTLive Button --}}
+            <form method="POST" action="{{ route('btlive.convert', $lc) }}" 
+                  onsubmit="return confirm('Convert this class to BTLive? Students will join via BTLive instead of external meeting link.')">
+                @csrf
+                <button type="submit" 
+                        class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    Make BTLive
+                </button>
+            </form>
+            
+            <a href="{{ $lc->meeting_url }}" target="_blank"
+               class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.07A1 1 0 0121 8.845v6.31a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                Open
+            </a>
+        @endif
 
         @if($lc->status === 'scheduled')
         <form method="POST" action="{{ route('tenant.live_classes.markLive', [$course, $lc]) }}">

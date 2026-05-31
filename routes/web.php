@@ -43,6 +43,9 @@ use App\Http\Controllers\Student\ExamController as StudentExamController;
 use App\Http\Controllers\Student\NotificationController as StudentNotificationController;
 use App\Http\Controllers\Student\BookController as StudentBookController;
 
+// BTLive Controller
+use App\Http\Controllers\BTLiveController;
+
 /*
 |--------------------------------------------------------------------------
 | Detect Subdomain and Route Accordingly
@@ -309,6 +312,19 @@ if (!$isAdminSubdomain && !$isCentralDomain) {
             Route::post('/{liveClass}/upload-video', [TenantLiveClassController::class, 'uploadVideo'])->name('uploadVideo');
         });
 
+        // BTLive Routes
+        Route::prefix('btlive')->name('btlive.')->group(function () {
+            Route::get('/{liveClass}/room', [BTLiveController::class, 'teacherRoom'])->name('teacher_room');
+            Route::get('/{liveClass}/attendance', [BTLiveController::class, 'attendance'])->name('attendance');
+            Route::post('/{liveClass}/end', [BTLiveController::class, 'endMeeting'])->name('end_meeting');
+            Route::post('/{liveClass}/kick-participant', [BTLiveController::class, 'kickParticipant'])->name('kick_participant');
+            Route::post('/{liveClass}/mute-all', [BTLiveController::class, 'muteAll'])->name('mute_all');
+            Route::get('/{liveClass}/live-stats', [BTLiveController::class, 'liveStats'])->name('live_stats');
+            Route::post('/{liveClass}/convert', [BTLiveController::class, 'convertToBTLive'])->name('convert');
+            Route::post('/{liveClass}/recording-webhook', [BTLiveController::class, 'recordingWebhook'])->name('recording_webhook');
+            Route::post('/{liveClass}/attendance-webhook', [BTLiveController::class, 'attendanceWebhook'])->name('attendance_webhook');
+        });
+
         // Exams
         Route::prefix('courses/{course}/exams')->name('tenant.exams.')->group(function () {
             Route::get('/', [ExamController::class, 'index'])->name('index');
@@ -547,6 +563,9 @@ if (!$isAdminSubdomain && !$isCentralDomain) {
 
         // Live Classes
         Route::get('/live-classes', [StudentLiveClassController::class, 'index'])->name('student.live_classes.index');
+        
+        // BTLive Student
+        Route::get('/btlive/{liveClass}/join', [BTLiveController::class, 'studentRoom'])->name('student.btlive.join');
 
         // Exams
         Route::get('/exams', [StudentExamController::class, 'index'])->name('student.exams.index');
