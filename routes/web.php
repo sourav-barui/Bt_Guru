@@ -566,6 +566,7 @@ if (!$isAdminSubdomain && !$isCentralDomain) {
         
         // BTLive Student
         Route::get('/btlive/{liveClass}/join', [BTLiveController::class, 'studentRoom'])->name('student.btlive.join');
+        Route::post('/btlive/{liveClass}/leave', [BTLiveController::class, 'studentLeave'])->name('student.btlive.leave');
 
         // Exams
         Route::get('/exams', [StudentExamController::class, 'index'])->name('student.exams.index');

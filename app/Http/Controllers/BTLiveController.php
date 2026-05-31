@@ -106,6 +106,25 @@ class BTLiveController extends Controller
     }
     
     /**
+     * Student Leave - Record attendance when student leaves
+     * POST /student/btlive/{liveClass}/leave
+     */
+    public function studentLeave(LiveClass $liveClass)
+    {
+        $student = Auth::user();
+        
+        // Check if student can access
+        if (!$this->canStudentAccess($liveClass, $student)) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        
+        // Record leave attendance
+        $this->recordAttendance($liveClass, $student, 'leave');
+        
+        return response()->json(['success' => true]);
+    }
+    
+    /**
      * Attendance View (Teacher)
      * GET /btlive/{liveClass}/attendance
      */
