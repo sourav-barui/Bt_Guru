@@ -194,10 +194,18 @@ class RegisterController extends Controller
                 }
             }
 
+            // ── Generate unique slug ─────────────────
+            $baseSlug = Str::slug($reg->get('coaching_name'));
+            $slug = $baseSlug;
+            $counter = 1;
+            while (Tenant::where('slug', $slug)->exists()) {
+                $slug = $baseSlug . '-' . str_pad((string) $counter++, 3, '0', STR_PAD_LEFT);
+            }
+
             // ── Create Tenant ──────────────────────────
             $tenant = Tenant::create([
                 'coaching_name' => $reg->get('coaching_name'),
-                'slug'          => Str::slug($reg->get('coaching_name')),
+                'slug'          => $slug,
                 'subdomain'     => $reg->get('subdomain'),
                 'email'         => $reg->get('email'),
                 'phone'         => $reg->get('phone'),
