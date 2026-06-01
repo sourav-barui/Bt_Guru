@@ -130,12 +130,17 @@ try {
 
 if (api) {
     // Hide loading when ready
-    api.addEventListener('videoConferenceJoined', () => {
-        document.getElementById('jitsi-loading').style.display = 'none';
-        
-        // Student restrictions are enforced by JWT/config
-        // But we can also toggle UI here if needed
-    });
+    function hideLoading() {
+        const loading = document.getElementById('jitsi-loading');
+        if (loading) loading.style.display = 'none';
+    }
+    
+    api.addEventListener('videoConferenceJoined', hideLoading);
+    api.addEventListener('ready', hideLoading);
+    api.addEventListener('prejoinScreenLoaded', hideLoading);
+    
+    // Also hide after 5 seconds as fallback
+    setTimeout(hideLoading, 5000);
     
     // Handle errors
     api.addEventListener('errorOccurred', (error) => {
