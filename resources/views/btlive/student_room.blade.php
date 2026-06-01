@@ -98,14 +98,14 @@
 </div>
 
 @push('scripts')
-<script src='https://meet.jit.si/external_api.js'></script>
+<script src='https://{{ config('btlive.jitsi_domain', 'meet.jit.si') }}/external_api.js'></script>
 <script>
 const jitsiConfig = @json($jitsiConfig);
 const jwt = @json($jwt);
 let handRaised = false;
 
 // Initialize Jitsi
-const domain = 'meet.jit.si';
+const domain = '{{ config('btlive.jitsi_domain', 'meet.jit.si') }}';
 const options = {
     roomName: jitsiConfig.roomName,
     parentNode: document.getElementById('jitsi-container'),
