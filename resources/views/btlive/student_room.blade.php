@@ -109,11 +109,15 @@ const domain = '{{ config('btlive.jitsi_domain', 'meet.jit.si') }}';
 const options = {
     roomName: jitsiConfig.roomName,
     parentNode: document.getElementById('jitsi-container'),
-    jwt: jwt,
     configOverwrite: jitsiConfig.configOverwrite,
     interfaceConfigOverwrite: jitsiConfig.interfaceConfigOverwrite,
     userInfo: jitsiConfig.userInfo,
 };
+
+// Only pass JWT if required
+if (jwt && '{{ config('btlive.require_jwt', true) }}' === '1') {
+    options.jwt = jwt;
+}
 
 let api;
 try {
