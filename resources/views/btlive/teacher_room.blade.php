@@ -174,9 +174,17 @@ if (jwt && '{{ config('btlive.require_jwt', true) }}' === '1') {
 const api = new JitsiMeetExternalAPI(domain, options);
 
 // Hide loading when ready
-api.addEventListener('videoConferenceJoined', () => {
-    document.getElementById('jitsi-loading').style.display = 'none';
-});
+function hideLoading() {
+    const loading = document.getElementById('jitsi-loading');
+    if (loading) loading.style.display = 'none';
+}
+
+api.addEventListener('videoConferenceJoined', hideLoading);
+api.addEventListener('ready', hideLoading);
+api.addEventListener('prejoinScreenLoaded', hideLoading);
+
+// Also hide after 5 seconds as fallback
+setTimeout(hideLoading, 5000);
 
 // Track participant joins
 api.addEventListener('participantJoined', (participant) => {
