@@ -30,6 +30,7 @@ use App\Http\Controllers\Tenant\SettingsController as TenantSettingsController;
 use App\Http\Controllers\Tenant\LiveClassController as TenantLiveClassController;
 use App\Http\Controllers\Tenant\ExamController;
 use App\Http\Controllers\Tenant\BookController as TenantBookController;
+use App\Http\Controllers\Tenant\ProfileController as TenantProfileController;
 
 // Teacher Controllers
 use App\Http\Controllers\Teacher\DashboardController as TeacherDashboardController;
@@ -446,6 +447,11 @@ if (!$isAdminSubdomain && !$isCentralDomain) {
                 Route::post('/manual/{subscription}', [PaymentController::class, 'submitManualPayment'])->name('manual_submit');
             });
         });
+
+        // Profile Management
+        Route::get('/profile', [TenantProfileController::class, 'index'])->name('tenant.profile');
+        Route::post('/profile', [TenantProfileController::class, 'update'])->name('tenant.profile.update');
+        Route::post('/profile/password', [TenantProfileController::class, 'changePassword'])->name('tenant.profile.password');
     });
 
     /*
