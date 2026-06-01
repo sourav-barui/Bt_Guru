@@ -23,7 +23,16 @@ class BTLiveRecordingController extends Controller
      */
     public function index(Tenant $tenant, LiveClass $liveClass)
     {
-        $this->authorize('view', $liveClass);
+        // Authorize: must be tenant admin or teacher of this course
+        $user = Auth::user();
+        if (!$user->isTenantAdmin() && !$user->isTeacher()) {
+            abort(403, 'Unauthorized');
+        }
+        
+        // Must belong to same tenant
+        if ($user->tenant_id !== $liveClass->tenant_id) {
+            abort(403, 'Unauthorized');
+        }
         
         $recordings = $liveClass->recordings()->with('approvedBy')->orderBy('created_at', 'desc')->get();
         
@@ -35,7 +44,14 @@ class BTLiveRecordingController extends Controller
      */
     public function approve(Tenant $tenant, BTLiveRecording $recording, Request $request)
     {
-        $this->authorize('update', $recording->liveClass);
+        // Authorize: must be tenant admin or teacher
+        $user = Auth::user();
+        if (!$user->isTenantAdmin() && !$user->isTeacher()) {
+            abort(403, 'Unauthorized');
+        }
+        if ($user->tenant_id !== $recording->liveClass->tenant_id) {
+            abort(403, 'Unauthorized');
+        }
         
         $request->validate([
             'notes' => 'nullable|string|max:500',
@@ -57,7 +73,14 @@ class BTLiveRecordingController extends Controller
      */
     public function reject(Tenant $tenant, BTLiveRecording $recording, Request $request)
     {
-        $this->authorize('update', $recording->liveClass);
+        // Authorize: must be tenant admin or teacher
+        $user = Auth::user();
+        if (!$user->isTenantAdmin() && !$user->isTeacher()) {
+            abort(403, 'Unauthorized');
+        }
+        if ($user->tenant_id !== $recording->liveClass->tenant_id) {
+            abort(403, 'Unauthorized');
+        }
         
         $request->validate([
             'notes' => 'nullable|string|max:500',
@@ -77,7 +100,14 @@ class BTLiveRecordingController extends Controller
      */
     public function download(Tenant $tenant, BTLiveRecording $recording)
     {
-        $this->authorize('view', $recording->liveClass);
+        // Authorize: must be tenant admin or teacher
+        $user = Auth::user();
+        if (!$user->isTenantAdmin() && !$user->isTeacher()) {
+            abort(403, 'Unauthorized');
+        }
+        if ($user->tenant_id !== $recording->liveClass->tenant_id) {
+            abort(403, 'Unauthorized');
+        }
         
         $url = $this->recordingService->getDownloadUrl($recording);
         
