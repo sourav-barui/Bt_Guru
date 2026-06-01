@@ -46,6 +46,14 @@
     <form action="{{ route('btlive.store', $course) }}" method="POST" class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-6">
         @csrf
         
+        {{-- Hidden fields for curriculum level --}}
+        @if(request('chapter_id'))
+            <input type="hidden" name="chapter_id" value="{{ request('chapter_id') }}">
+        @endif
+        @if(request('lesson_id'))
+            <input type="hidden" name="lesson_id" value="{{ request('lesson_id') }}">
+        @endif
+        
         {{-- Title --}}
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Class Title <span class="text-red-500">*</span></label>
@@ -69,7 +77,7 @@
             <select name="subject_id" class="w-full rounded-lg border-gray-300 focus:border-red-500 focus:ring-red-500">
                 <option value="">-- Select Subject (Optional) --</option>
                 @foreach($subjects as $id => $name)
-                    <option value="{{ $id }}" {{ old('subject_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
+                    <option value="{{ $id }}" {{ (old('subject_id') ?? request('subject_id')) == $id ? 'selected' : '' }}>{{ $name }}</option>
                 @endforeach
             </select>
         </div>
