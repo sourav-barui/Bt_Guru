@@ -245,6 +245,22 @@ if (api) {
         }
     };
     
+    // Auto-enter fullscreen and landscape
+    setTimeout(() => {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen().catch(e => console.log(e));
+        }
+        // Lock landscape
+        if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('landscape').catch(e => console.log(e));
+        }
+    }, 1000);
+    
+    // Auto-join commands
+    api.executeCommand('toggleAudio', []);
+    api.executeCommand('toggleVideo', []);
+    
     // Start auto-hide
     autoHideBar();
     

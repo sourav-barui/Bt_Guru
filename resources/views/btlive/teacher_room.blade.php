@@ -260,7 +260,29 @@ function toggleFullScreen() {
 // Auto-enter fullscreen on load
 setTimeout(() => {
     document.body.classList.add('fullscreen-mode');
+    // Request browser fullscreen
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen().catch(e => console.log('Fullscreen:', e));
+    } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+    }
 }, 1000);
+
+// Auto-join the conference when ready
+api.addEventListener('videoConferenceJoined', () => {
+    hideLoading();
+    // Lock to landscape on mobile
+    if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock('landscape').catch(e => console.log('Orientation:', e));
+    }
+});
+
+// Try to auto-execute join
+api.executeCommand('toggleAudio', []);
+api.executeCommand('toggleVideo', []);
 
 // Run branding hide after load
 setTimeout(hideJitsiBranding, 3000);

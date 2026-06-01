@@ -204,9 +204,16 @@ class BTLiveService
                 // Chat
                 'disableChat' => !$liveClass->btlive_chat_enabled,
                 
-                // UI customization
+                // UI customization - Disable all prompts for auto-join
                 'defaultLanguage' => 'en',
                 'prejoinPageEnabled' => false,
+                'enableWelcomePage' => false,
+                'enableClosePage' => false,
+                'disableDeepLinking' => true,
+                'disableInviteFunctions' => true,
+                'hideConferenceSubject' => true,
+                'hideConferenceTimer' => true,
+                'hideParticipantsStats' => true,
                 
                 // Bandwidth optimization
                 'disableSimulcast' => false,
