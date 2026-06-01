@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\SubscriptionPlanController as AdminSubscriptionPlanController;
 use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Admin\SubscriptionController as AdminSubscriptionController;
+use App\Http\Controllers\Admin\BTLiveSettingsController;
 
 // Tenant Controllers
 use App\Http\Controllers\Tenant\DashboardController as TenantDashboardController;
@@ -135,6 +136,12 @@ if ($isAdminSubdomain) {
         Route::post('/settings', [AdminSettingsController::class, 'update'])->name('admin.settings.update');
         Route::post('/settings/test-mail', [AdminSettingsController::class, 'testMail'])->name('admin.settings.test_mail');
         Route::post('/settings/diagnose-mail', [AdminSettingsController::class, 'diagnoseMail'])->name('admin.settings.diagnose_mail');
+        
+        // BTLive Settings
+        Route::get('/btlive-settings', [BTLiveSettingsController::class, 'index'])->name('admin.btlive.settings');
+        Route::post('/btlive-settings', [BTLiveSettingsController::class, 'update'])->name('admin.btlive.settings.update');
+        Route::post('/btlive-settings/cleanup', [BTLiveSettingsController::class, 'cleanup'])->name('admin.btlive.cleanup');
+        Route::post('/btlive-settings/test-s3', [BTLiveSettingsController::class, 'testS3'])->name('admin.btlive.test-s3');
 
         // Subscription Plans
         Route::prefix('subscription-plans')->name('admin.subscription_plans.')->group(function () {
