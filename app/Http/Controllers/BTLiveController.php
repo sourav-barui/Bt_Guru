@@ -27,7 +27,13 @@ class BTLiveController extends Controller
     {
         $this->authorizeCourse($course);
         
-        $subjects = $course->subjects()->pluck('name', 'id');
+        // Get subjects through curricula (course -> curricula -> subjects)
+        $subjects = $course->curricula()
+            ->with('subjects')
+            ->get()
+            ->pluck('subjects')
+            ->flatten()
+            ->pluck('name', 'id');
         
         return view('btlive.create', compact('course', 'subjects'));
     }
