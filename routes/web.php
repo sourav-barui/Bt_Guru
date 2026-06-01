@@ -315,6 +315,8 @@ if (!$isAdminSubdomain && !$isCentralDomain) {
 
         // BTLive Routes
         Route::prefix('btlive')->name('btlive.')->group(function () {
+            Route::get('/create/{course}', [BTLiveController::class, 'create'])->name('create');
+            Route::post('/store/{course}', [BTLiveController::class, 'store'])->name('store');
             Route::get('/{liveClass}/room', [BTLiveController::class, 'teacherRoom'])->name('teacher_room');
             Route::get('/{liveClass}/attendance', [BTLiveController::class, 'attendance'])->name('attendance');
             Route::post('/{liveClass}/end', [BTLiveController::class, 'endMeeting'])->name('end_meeting');

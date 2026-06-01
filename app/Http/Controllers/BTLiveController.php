@@ -20,6 +20,77 @@ class BTLiveController extends Controller
     }
     
     /**
+     * Show form to create new BTLive class
+     * GET /btlive/create/{course}
+     */
+    public function create(Course $course)
+    {
+        $this->authorizeCourse($course);
+        
+        $subjects = $course->subjects()->pluck('name', 'id');
+        
+        return view('btlive.create', compact('course', 'subjects'));
+    }
+    
+    /**
+     * Store new BTLive class
+     * POST /btlive/store/{course}
+     */
+    public function store(Request $request, Course $course)
+    {
+        $this->authorizeCourse($course);
+        
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'subject_id' => 'nullable|exists:subjects,id',
+            'scheduled_at' => 'required|date|after:now',
+            'duration_minutes' => 'required|integer|min:15|max:300',
+            'is_public' => 'boolean',
+            'btlive_lobby_enabled' => 'boolean',
+            'btlive_chat_enabled' => 'boolean',
+            'btlive_teacher_only_video' => 'boolean',
+        ]);
+        
+        $tenant = Auth::user()->tenant;
+        
+        // Generate unique room name
+        $roomName = $this->btliveService->generateRoomName(null, $tenant->slug);
+        
+        // Create LiveClass with BTLive enabled
+        $liveClass = LiveClass::create([
+            'tenant_id' => $tenant->id,
+            'course_id' => $course->id,
+            'subject_id' => $validated['subject_id'] ?? null,
+            'created_by' => Auth::id(),
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'platform' => 'jitsi',
+            'meeting_url' => 'https://' . config('btlive.jitsi_domain', 'meet.jit.si') . '/' . $roomName,
+            'scheduled_at' => $validated['scheduled_at'],
+            'duration_minutes' => $validated['duration_minutes'],
+            'status' => 'scheduled',
+            'is_public' => $validated['is_public'] ?? false,
+            // BTLive settings
+            'is_btlive' => true,
+            'btlive_room_name' => $roomName,
+            'btlive_lobby_enabled' => $validated['btlive_lobby_enabled'] ?? true,
+            'btlive_waiting_room_enabled' => true,
+            'btlive_chat_enabled' => $validated['btlive_chat_enabled'] ?? true,
+            'btlive_teacher_only_video' => $validated['btlive_teacher_only_video'] ?? true,
+            'btlive_teacher_only_audio' => true,
+            'btlive_attendance_enabled' => true,
+            'btlive_jwt_required' => config('btlive.require_jwt', true),
+        ]);
+        
+        // Notify enrolled students
+        $this->notifyStudentsClassScheduled($liveClass);
+        
+        return redirect()->route('tenant.live_classes.index', $course)
+            ->with('success', 'BTLive class scheduled successfully!');
+    }
+    
+    /**
      * Teacher Classroom View
      * GET /btlive/{liveClass}/room
      */
@@ -516,5 +587,59 @@ class BTLiveController extends Controller
         if (str_contains($ua, 'Android')) return 'Android';
         if (str_contains($ua, 'iOS') || str_contains($ua, 'iPhone')) return 'iOS';
         return 'Other';
+    }
+    
+    /**
+     * Authorize user can manage course
+     */
+    protected function authorizeCourse(Course $course): void
+    {
+        $user = Auth::user();
+        
+        if ($user->hasRole('super_admin')) {
+            return;
+        }
+        
+        if ($user->tenant_id !== $course->tenant_id) {
+            abort(403, 'Unauthorized access to this course.');
+        }
+        
+        if (!$user->hasAnyRole(['tenant_admin', 'teacher'])) {
+            abort(403, 'Only admins and teachers can create live classes.');
+        }
+    }
+    
+    /**
+     * Send notifications when class is scheduled
+     */
+    protected function notifyStudentsClassScheduled(LiveClass $liveClass): void
+    {
+        $service = new NotificationService();
+        
+        if ($liveClass->is_public) {
+            $students = \App\Models\User::where('tenant_id', $liveClass->tenant_id)
+                ->whereHas('roles', fn($q) => $q->where('name', 'student'))
+                ->get();
+        } else {
+            $students = \App\Models\User::where('tenant_id', $liveClass->tenant_id)
+                ->whereHas('enrollments', fn($q) => $q
+                    ->where('course_id', $liveClass->course_id)
+                    ->whereIn('enrollment_status', ['active', 'approved'])
+                )
+                ->get();
+        }
+        
+        $scheduledTime = $liveClass->scheduled_at->format('D, M d \a\t h:i A');
+        
+        $service->send(
+            $liveClass->tenant,
+            $students,
+            type: 'live_class',
+            title: "📅 Class Scheduled: {$liveClass->title}",
+            body: "New BTLive class on {$scheduledTime} — {$liveClass->course->title}",
+            icon: 'calendar',
+            url: '/student/live-classes',
+            sendEmail: true
+        );
     }
 }

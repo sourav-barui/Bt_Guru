@@ -14,10 +14,18 @@
             </a>
             <p class="text-sm text-gray-500">Schedule and manage live classes for students</p>
         </div>
-        <a href="{{ route('tenant.live_classes.create', $course) }}" class="btn-primary inline-flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            Schedule Live Class
-        </a>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('btlive.create', $course) }}" class="btn-primary inline-flex items-center gap-2 bg-red-600 hover:bg-red-700">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+                New BTLive
+            </a>
+            <a href="{{ route('tenant.live_classes.create', $course) }}" class="btn-secondary inline-flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                External Meeting
+            </a>
+        </div>
     </div>
 
     @if(session('success'))
