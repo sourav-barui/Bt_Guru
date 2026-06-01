@@ -8,6 +8,14 @@
     ];
     $pStyle = $platformColors[$lc->platform] ?? $platformColors['other'];
     
+    // BTLive override
+    if($lc->is_btlive) {
+        $pStyle = ['bg' => 'bg-red-100', 'text' => 'text-red-700', 'icon' => '🔴'];
+    }
+    
+    // Get student join URL
+    $joinUrl = $lc->is_btlive ? route('student.btlive.join', $lc) : $lc->secure_meeting_url;
+    
     $statusConfig = [
         'live' => ['badge' => 'bg-red-100 text-red-700', 'ring' => 'ring-red-400', 'btn' => 'tb-btn-primary bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800'],
         'upcoming' => ['badge' => 'bg-indigo-100 text-indigo-700', 'ring' => 'ring-indigo-400', 'btn' => 'tb-btn-primary'],
@@ -95,11 +103,11 @@
         
         {{-- Join/Watch Button --}}
         @if($mode === 'live')
-            <a href="{{ $lc->secure_meeting_url }}" target="_blank" class="tb-btn-primary w-full justify-center bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 border-red-600">
+            <a href="{{ $joinUrl }}" target="_blank" class="tb-btn-primary w-full justify-center bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 border-red-600">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                 </svg>
-                Join Live Now
+                {{ $lc->is_btlive ? '🔴 Join BTLive' : 'Join Live Now' }}
             </a>
         @elseif($mode === 'upcoming')
             <div class="flex items-center justify-center gap-2 py-3 bg-indigo-50 rounded-xl text-indigo-600">
