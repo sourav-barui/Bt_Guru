@@ -285,6 +285,16 @@ if (api) {
         alert('You have been removed from the class by the teacher.');
         window.location.href = '{{ route("student.live_classes.index") }}';
     });
+    
+    // Handle hangup/exit - redirect to dashboard
+    api.addEventListener('videoConferenceLeft', (event) => {
+        window.location.href = '{{ route("student.live_classes.index") }}';
+    });
+    
+    // Also handle readyToClose event
+    api.addEventListener('readyToClose', (event) => {
+        window.location.href = '{{ route("student.live_classes.index") }}';
+    });
 }
 
 // Toggle chat
