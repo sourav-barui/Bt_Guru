@@ -33,6 +33,27 @@ return [
     'auto_start_recording' => env('BTLIVE_AUTO_RECORD', false),
     'recording_format' => env('BTLIVE_RECORD_FORMAT', 'mp4'),
     
+    // Recording Storage Configuration
+    'recordings' => [
+        'enabled' => env('BTLIVE_RECORDING_ENABLED', true),
+        'local_enabled' => env('BTLIVE_LOCAL_STORAGE', true),
+        'local_path' => env('BTLIVE_RECORDINGS_PATH', '/var/lib/jitsi-meet/recordings'),
+        
+        // S3 Configuration
+        's3_enabled' => env('BTLIVE_S3_ENABLED', false),
+        's3_disk' => env('BTLIVE_S3_DISK', 's3'), // Laravel disk name
+        's3_bucket' => env('BTLIVE_S3_BUCKET', null),
+        's3_region' => env('BTLIVE_S3_REGION', 'us-east-1'),
+        's3_access_key' => env('BTLIVE_S3_ACCESS_KEY', null),
+        's3_secret_key' => env('BTLIVE_S3_SECRET_KEY', null),
+        's3_endpoint' => env('BTLIVE_S3_ENDPOINT', null), // For MinIO/DigitalOcean Spaces
+        
+        // Recording Limits
+        'max_duration' => env('BTLIVE_MAX_RECORDING_DURATION', 240), // minutes
+        'auto_cleanup_days' => env('BTLIVE_AUTO_CLEANUP_DAYS', 30), // delete after X days
+        'max_storage_per_tenant_gb' => env('BTLIVE_MAX_STORAGE_GB', 50),
+    ],
+    
     // Security settings
     'require_jwt' => env('BTLIVE_REQUIRE_JWT', true),
     'enable_lobby' => env('BTLIVE_ENABLE_LOBBY', true),

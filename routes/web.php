@@ -326,6 +326,13 @@ if (!$isAdminSubdomain && !$isCentralDomain) {
             Route::post('/{liveClass}/convert', [BTLiveController::class, 'convertToBTLive'])->name('convert');
             Route::post('/{liveClass}/recording-webhook', [BTLiveController::class, 'recordingWebhook'])->name('recording_webhook');
             Route::post('/{liveClass}/attendance-webhook', [BTLiveController::class, 'attendanceWebhook'])->name('attendance_webhook');
+            
+            // Recording Management
+            Route::get('/{liveClass}/recordings', [BTLiveRecordingController::class, 'index'])->name('recordings.index');
+            Route::post('/recordings/{recording}/approve', [BTLiveRecordingController::class, 'approve'])->name('recordings.approve');
+            Route::post('/recordings/{recording}/reject', [BTLiveRecordingController::class, 'reject'])->name('recordings.reject');
+            Route::get('/recordings/{recording}/download', [BTLiveRecordingController::class, 'download'])->name('recordings.download');
+            Route::get('/recordings', [BTLiveRecordingController::class, 'adminIndex'])->name('recordings.admin');
         });
 
         // Exams
