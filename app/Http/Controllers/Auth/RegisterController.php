@@ -29,7 +29,7 @@ class RegisterController extends Controller
     {
         $request->validate([
             'coaching_name' => 'required|string|max:255',
-            'subdomain'     => 'required|string|max:50|alpha_dash|unique:tenants,subdomain',
+            'subdomain'     => 'required|string|max:50|alpha_dash|unique:tenants,subdomain,NULL,id,deleted_at,NULL',
             'coaching_type' => 'required|string|max:100',
             'tagline'       => 'nullable|string|max:255',
             'website'       => 'nullable|url|max:255',
@@ -198,7 +198,7 @@ class RegisterController extends Controller
             $baseSlug = Str::slug($reg->get('coaching_name'));
             $slug = $baseSlug;
             $counter = 1;
-            while (Tenant::where('slug', $slug)->exists()) {
+            while (Tenant::withTrashed()->where('slug', $slug)->exists()) {
                 $slug = $baseSlug . '-' . str_pad((string) $counter++, 3, '0', STR_PAD_LEFT);
             }
 
@@ -304,7 +304,7 @@ class RegisterController extends Controller
         if (strlen($subdomain) < 3) {
             return response()->json(['available' => false, 'message' => 'Too short']);
         }
-        $exists = Tenant::where('subdomain', $subdomain)->exists();
+        $exists = Tenant::withTrashed()->where('subdomain', $subdomain)->exists();
         return response()->json([
             'available' => !$exists,
             'message'   => $exists ? 'Already taken' : 'Available!',
