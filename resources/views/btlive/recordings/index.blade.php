@@ -7,9 +7,9 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-2xl font-bold text-gray-800">Live Class Recordings</h1>
-            <p class="text-gray-600 mt-1">{{ $liveClass->title }} - {{ $liveClass->course->name }}</p>
+            <p class="text-gray-600 mt-1">{{ $liveClass->title }} - {{ $liveClass->course?->name ?? 'N/A' }}</p>
         </div>
-        <a href="{{ route('tenant.live_classes.index', $liveClass->course) }}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
+        <a href="{{ route('tenant.live_classes.index', $liveClass->course_id) }}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
             Back to Live Classes
         </a>
     </div>
@@ -55,10 +55,18 @@
                             <div class="text-sm text-gray-500">{{ $recording->created_at->format('M d, Y H:i') }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $recording->duration_formatted }}
+                            @if($recording->duration)
+                                {{ floor($recording->duration / 60) }}:{{ str_pad($recording->duration % 60, 2, '0', STR_PAD_LEFT) }}
+                            @else
+                                -
+                            @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $recording->file_size_formatted }}
+                            @if($recording->file_size)
+                                {{ round($recording->file_size / 1048576, 2) }} MB
+                            @else
+                                -
+                            @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($recording->is_approved)
@@ -87,20 +95,20 @@
                             <div class="flex space-x-2">
                                 @if($recording->status === 'completed')
                                     @if(!$recording->is_approved)
-                                        <form action="{{ route('tenant.btlive.recordings.approve', ['tenant' => $tenant->slug, 'recording' => $recording->id]) }}" method="POST" class="inline">
+                                        <form action="{{ route('tenant.btlive.recordings.approve', ['tenant' => $liveClass->course->tenant->slug ?? 'default', 'recording' => $recording->id]) }}" method="POST" class="inline">
                                             @csrf
                                             <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs">
                                                 Approve
                                             </button>
                                         </form>
-                                        <form action="{{ route('tenant.btlive.recordings.reject', ['tenant' => $tenant->slug, 'recording' => $recording->id]) }}" method="POST" class="inline">
+                                        <form action="{{ route('tenant.btlive.recordings.reject', ['tenant' => $liveClass->course->tenant->slug ?? 'default', 'recording' => $recording->id]) }}" method="POST" class="inline">
                                             @csrf
                                             <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">
                                                 Reject
                                             </button>
                                         </form>
                                     @endif
-                                    <a href="{{ route('tenant.btlive.recordings.download', ['tenant' => $tenant->slug, 'recording' => $recording->id]) }}" 
+                                    <a href="{{ route('tenant.btlive.recordings.download', ['tenant' => $liveClass->course->tenant->slug ?? 'default', 'recording' => $recording->id]) }}" 
                                        class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs"
                                        target="_blank">
                                         Download
