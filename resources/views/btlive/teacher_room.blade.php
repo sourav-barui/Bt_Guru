@@ -1,9 +1,52 @@
 @extends('layouts.tenant')
 
 @section('title', 'BTLive - ' . $liveClass->title)
-@section('page-title', 'BTLive Classroom')
+
+@push('styles')
+<style>
+    /* Full screen mode - hide sidebar */
+    body.fullscreen-mode .sidebar,
+    body.fullscreen-mode .sidebar-nav,
+    body.fullscreen-mode [class*="sidebar"],
+    body.fullscreen-mode aside,
+    body.fullscreen-mode nav:not(.bg-gradient-to-r) {
+        display: none !important;
+    }
+    body.fullscreen-mode .main-content,
+    body.fullscreen-mode .content-wrapper,
+    body.fullscreen-mode main {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+    body.fullscreen-mode {
+        overflow: hidden;
+    }
+    #fullscreen-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    #fullscreen-btn:hover {
+        background: rgba(0,0,0,0.9);
+        transform: scale(1.1);
+    }
+</style>
+@endpush
 
 @section('page-content')
+<!-- Fullscreen Toggle Button -->
+<button id="fullscreen-btn" onclick="toggleFullScreen()" title="Toggle Full Screen">
+    <svg id="fullscreen-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+    </svg>
+</button>
 <div class="h-screen flex flex-col -m-6">
     <!-- Header -->
     <div class="bg-gradient-to-r from-red-600 to-red-800 text-white px-4 py-3 flex items-center justify-between shrink-0">
@@ -178,6 +221,50 @@ function hideLoading() {
     const loading = document.getElementById('jitsi-loading');
     if (loading) loading.style.display = 'none';
 }
+
+// Hide Jitsi branding elements
+function hideJitsiBranding() {
+    // Try to access iframe and hide branding
+    const iframe = document.getElementById('jitsiConferenceFrame0');
+    if (iframe && iframe.contentWindow && iframe.contentWindow.document) {
+        const jitsiDoc = iframe.contentWindow.document;
+        // Hide watermarks
+        const watermarks = jitsiDoc.querySelectorAll('.watermark, .leftwatermark, .rightwatermark');
+        watermarks.forEach(el => el.style.display = 'none');
+    }
+}
+
+// Toggle Full Screen Mode
+function toggleFullScreen() {
+    document.body.classList.toggle('fullscreen-mode');
+    
+    // Also toggle browser fullscreen API for video container
+    const elem = document.documentElement;
+    if (!document.fullscreenElement) {
+        elem.requestFullscreen().catch(err => {
+            console.log('Fullscreen error:', err);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+    
+    // Change icon
+    const icon = document.getElementById('fullscreen-icon');
+    if (document.body.classList.contains('fullscreen-mode')) {
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+    } else {
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>';
+    }
+}
+
+// Auto-enter fullscreen on load
+setTimeout(() => {
+    document.body.classList.add('fullscreen-mode');
+}, 1000);
+
+// Run branding hide after load
+setTimeout(hideJitsiBranding, 3000);
+setTimeout(hideJitsiBranding, 6000);
 
 api.addEventListener('videoConferenceJoined', hideLoading);
 api.addEventListener('ready', hideLoading);

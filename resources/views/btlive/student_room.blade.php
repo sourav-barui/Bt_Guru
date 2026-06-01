@@ -2,6 +2,54 @@
 
 @section('title', 'BTLive - ' . $liveClass->title)
 
+@push('styles')
+<style>
+    /* Auto-hide bottom action bar */
+    #action-bar {
+        transition: transform 0.3s ease;
+    }
+    #action-bar.hidden-bar {
+        transform: translateY(100%);
+    }
+    #action-bar:hover, 
+    #action-bar.show-bar {
+        transform: translateY(0);
+    }
+    /* Fullscreen button */
+    #fullscreen-btn {
+        position: fixed;
+        bottom: 80px;
+        right: 15px;
+        z-index: 1000;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 10px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    #fullscreen-btn:hover {
+        background: rgba(0,0,0,0.9);
+        transform: scale(1.1);
+    }
+    /* Toggle bar button */
+    #toggle-bar-btn {
+        position: fixed;
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1001;
+        background: rgba(0,0,0,0.5);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+</style>
+@endpush
+
 @section('mobile-content')
 <div class="h-screen flex flex-col">
     <!-- Header -->
@@ -61,8 +109,18 @@
         </div>
     </div>
     
-    <!-- Quick Actions Bar -->
-    <div class="bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-around shrink-0">
+    <!-- Fullscreen Toggle Button -->
+<button id="fullscreen-btn" onclick="toggleFullScreen()" title="Toggle Full Screen">
+    <svg id="fullscreen-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+    </svg>
+</button>
+
+<!-- Toggle Bar Button -->
+<button id="toggle-bar-btn" onclick="toggleActionBar()">Hide Bar ↑</button>
+
+<!-- Quick Actions Bar -->
+    <div id="action-bar" class="bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-around shrink-0">
         <button onclick="toggleChat()" class="flex flex-col items-center gap-1 text-gray-600">
             <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,6 +192,61 @@ if (api) {
         const loading = document.getElementById('jitsi-loading');
         if (loading) loading.style.display = 'none';
     }
+    
+    // Hide Jitsi branding
+    function hideJitsiBranding() {
+        const iframe = document.getElementById('jitsiConferenceFrame0');
+        if (iframe && iframe.contentWindow && iframe.contentWindow.document) {
+            const jitsiDoc = iframe.contentWindow.document;
+            const watermarks = jitsiDoc.querySelectorAll('.watermark, .leftwatermark, .rightwatermark');
+            watermarks.forEach(el => el.style.display = 'none');
+        }
+    }
+    setTimeout(hideJitsiBranding, 3000);
+    setTimeout(hideJitsiBranding, 6000);
+    
+    // Auto-hide action bar after 5 seconds
+    let barTimeout;
+    function autoHideBar() {
+        barTimeout = setTimeout(() => {
+            document.getElementById('action-bar').classList.add('hidden-bar');
+            document.getElementById('toggle-bar-btn').textContent = 'Show Bar ↓';
+        }, 5000);
+    }
+    
+    // Toggle action bar
+    window.toggleActionBar = function() {
+        const bar = document.getElementById('action-bar');
+        const btn = document.getElementById('toggle-bar-btn');
+        bar.classList.toggle('hidden-bar');
+        if (bar.classList.contains('hidden-bar')) {
+            btn.textContent = 'Show Bar ↓';
+            clearTimeout(barTimeout);
+        } else {
+            btn.textContent = 'Hide Bar ↑';
+            autoHideBar();
+        }
+    };
+    
+    // Show bar on hover of bottom area
+    document.addEventListener('mousemove', (e) => {
+        if (e.clientY > window.innerHeight - 50) {
+            document.getElementById('action-bar').classList.remove('hidden-bar');
+        }
+    });
+    
+    // Fullscreen toggle
+    window.toggleFullScreen = function() {
+        const elem = document.documentElement;
+        if (!document.fullscreenElement) {
+            elem.requestFullscreen().catch(err => console.log(err));
+        } else {
+            document.exitFullscreen();
+        }
+    };
+    
+    // Start auto-hide
+    autoHideBar();
     
     api.addEventListener('videoConferenceJoined', hideLoading);
     api.addEventListener('ready', hideLoading);

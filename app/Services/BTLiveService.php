@@ -218,9 +218,16 @@ class BTLiveService
                 'PROVIDER_NAME' => 'BT Guru',
                 'SHOW_JITSI_WATERMARK' => false,
                 'SHOW_WATERMARK_FOR_GUESTS' => false,
+                'SHOW_POWERED_BY' => false,
+                'JITSI_WATERMARK_LINK' => '',
                 'DEFAULT_BACKGROUND' => '#f3f4f6',
                 'DISABLE_TRANSCRIPTION_SUBTITLES' => true,
                 'DISABLE_VIDEO_BACKGROUND' => true,
+                'HIDE_INVITE_MORE_HEADER' => true,
+                'MOBILE_APP_PROMO' => false,
+                'ENABLE_FEEDBACK_ANIMATION' => false,
+                'DISABLE_FOCUS_INDICATOR' => true,
+                'DISABLE_DOMINANT_SPEAKER_INDICATOR' => false,
                 
                 // Hide features based on role
                 'TOOLBAR_BUTTONS' => $isModerator 
