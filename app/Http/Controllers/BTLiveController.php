@@ -279,7 +279,25 @@ class BTLiveController extends Controller
         
         $this->btliveService->handleRecordingWebhook($liveClass, $data);
         
-        return response()->json(['success' => true]);
+        // Auto-save recording to live class video_url
+        $recordingUrl = $liveClass->btlive_recording_url;
+        $autoSave = false;
+        
+        if ($recordingUrl && $liveClass->status === 'completed') {
+            // Auto-save to video_url for curriculum access
+            $liveClass->update([
+                'video_url' => $recordingUrl,
+            ]);
+            $autoSave = true;
+            Log::info("Auto-saved recording to curriculum for live class {$liveClass->id}");
+        }
+        
+        return response()->json([
+            'success' => true,
+            'recording_url' => $recordingUrl,
+            'auto_save' => $autoSave,
+            'live_class_id' => $liveClass->id,
+        ]);
     }
     
     /**

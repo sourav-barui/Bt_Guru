@@ -148,27 +148,69 @@
             
             <!-- Recording Status -->
             <div class="p-4 border-b border-gray-200">
-                <h3 class="font-semibold text-gray-900 mb-3">Recording</h3>
-                <div class="flex items-center gap-2 text-sm">
-                    <span class="w-2 h-2 rounded-full {{ $liveClass->btlive_recording_status === 'recording' ? 'bg-red-500 animate-pulse' : 'bg-gray-400' }}"></span>
-                    <span class="text-gray-700">
-                        @switch($liveClass->btlive_recording_status)
-                            @case('recording') Recording in progress... @break
-                            @case('processing') Processing... @break
-                            @case('completed') Recording available @break
-                            @default Ready to record
-                        @endswitch
-                    </span>
+                <h3 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                    </svg>
+                    Recording
+                </h3>
+                
+                <!-- Live Recording Status -->
+                <div id="recording-status-container">
+                    <div class="flex items-center gap-2 text-sm mb-2">
+                        <span id="recording-indicator" class="w-2 h-2 rounded-full bg-gray-400"></span>
+                        <span id="recording-status-text" class="text-gray-700">Ready to record</span>
+                    </div>
+                    
+                    <!-- Recording Timer -->
+                    <div id="recording-timer" class="hidden bg-gray-100 rounded-lg p-2 mb-2">
+                        <div class="text-xs text-gray-500 uppercase tracking-wide">Recording Duration</div>
+                        <div id="recording-time" class="text-2xl font-mono font-bold text-red-600">00:00:00</div>
+                    </div>
+                    
+                    <!-- Recording Saved Message -->
+                    <div id="recording-saved" class="hidden bg-green-50 border border-green-200 rounded-lg p-2 mb-2">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <div>
+                                <div class="text-sm font-semibold text-green-800">Recording Saved!</div>
+                                <div id="saved-recording-info" class="text-xs text-green-600"></div>
+                            </div>
+                        </div>
+                        <!-- Recording Link Container -->
+                        <div id="recording-link-container" class="hidden mt-2 pt-2 border-t border-green-200">
+                            <a id="recording-link" href="#" target="_blank" class="text-sm text-blue-600 hover:underline flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Watch Recording
+                            </a>
+                        </div>
+                        <div id="recording-processing" class="hidden mt-2 pt-2 border-t border-green-200 text-xs text-green-700">
+                            <span class="animate-pulse">⏳ Processing video... It will be available in curriculum shortly.</span>
+                        </div>
+                    </div>
                 </div>
+                
                 @if($liveClass->btlive_recording_url)
                     <a href="{{ $liveClass->btlive_recording_url }}" target="_blank" class="mt-2 text-sm text-blue-600 hover:underline flex items-center gap-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                         Watch Recording
                     </a>
                 @endif
+                
+                <a href="{{ route('tenant.btlive.recordings.index', [$liveClass->course->tenant->slug ?? $liveClass->tenant->slug, $liveClass]) }}" target="_blank" class="mt-2 text-sm text-gray-600 hover:text-blue-600 flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    Manage Recordings
+                </a>
             </div>
             
             <!-- Class Info -->
@@ -316,9 +358,127 @@ api.addEventListener('screenSharingStatusChanged', (status) => {
     }
 });
 
-// Recording status
+// Recording status with live updates
+let recordingStartTime = null;
+let recordingTimerInterval = null;
+let isRecording = false;
+
+function updateRecordingDisplay(status) {
+    const indicator = document.getElementById('recording-indicator');
+    const statusText = document.getElementById('recording-status-text');
+    const timer = document.getElementById('recording-timer');
+    const timeDisplay = document.getElementById('recording-time');
+    const savedMessage = document.getElementById('recording-saved');
+    
+    if (status === 'on' || status.on === true) {
+        // Recording started
+        isRecording = true;
+        recordingStartTime = Date.now();
+        
+        indicator.className = 'w-2 h-2 rounded-full bg-red-500 animate-pulse';
+        statusText.textContent = 'Recording in progress...';
+        statusText.className = 'text-red-600 font-semibold';
+        timer.classList.remove('hidden');
+        savedMessage.classList.add('hidden');
+        
+        // Start timer
+        if (recordingTimerInterval) clearInterval(recordingTimerInterval);
+        recordingTimerInterval = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+            const hours = Math.floor(elapsed / 3600);
+            const minutes = Math.floor((elapsed % 3600) / 60);
+            const seconds = elapsed % 60;
+            timeDisplay.textContent = 
+                String(hours).padStart(2, '0') + ':' + 
+                String(minutes).padStart(2, '0') + ':' + 
+                String(seconds).padStart(2, '0');
+        }, 1000);
+        
+    } else if (status === 'off' || status.on === false) {
+        // Recording stopped
+        isRecording = false;
+        
+        if (recordingTimerInterval) {
+            clearInterval(recordingTimerInterval);
+            recordingTimerInterval = null;
+        }
+        
+        indicator.className = 'w-2 h-2 rounded-full bg-green-500';
+        statusText.textContent = 'Recording stopped';
+        statusText.className = 'text-green-600 font-semibold';
+        timer.classList.add('hidden');
+        savedMessage.classList.remove('hidden');
+        
+        // Calculate final duration
+        let durationText = '';
+        if (recordingStartTime) {
+            const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
+            const minutes = Math.floor(duration / 60);
+            const seconds = duration % 60;
+            durationText = minutes > 0 ? 
+                `${minutes}m ${seconds}s` : `${seconds}s`;
+            document.getElementById('saved-recording-info').textContent = 
+                `Duration: ${durationText} • Saved to server • Processing...`;
+        }
+        
+        // Notify server that recording ended
+        notifyRecordingEnded(durationText);
+    }
+}
+
+function notifyRecordingEnded(duration) {
+    // Show processing state
+    document.getElementById('recording-processing').classList.remove('hidden');
+    
+    fetch('{{ route("btlive.recording_webhook", $liveClass) }}', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            event_type: 'recording.finished',
+            recording_id: 'btlive_' + '{{ $liveClass->id }}',
+            live_class_id: '{{ $liveClass->id }}',
+            duration: duration,
+            ended_at: new Date().toISOString()
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.recording_url) {
+            // Show recording link
+            document.getElementById('recording-processing').classList.add('hidden');
+            document.getElementById('recording-link-container').classList.remove('hidden');
+            document.getElementById('recording-link').href = data.recording_url;
+            
+            // Update saved info
+            document.getElementById('saved-recording-info').textContent = 
+                `Duration: ${duration} • Video ready to view`;
+            
+            // Auto-save to curriculum
+            if (data.auto_save) {
+                console.log('Recording auto-saved to curriculum');
+            }
+        }
+    })
+    .catch(e => console.log('Recording webhook failed:', e));
+}
+
 api.addEventListener('recordingStatusChanged', (status) => {
-    console.log('Recording status:', status);
+    console.log('Recording status changed:', status);
+    updateRecordingDisplay(status);
+});
+
+// Also listen for explicit start/stop events
+api.addEventListener('recordingStarted', (data) => {
+    console.log('Recording started:', data);
+    updateRecordingDisplay('on');
+});
+
+api.addEventListener('recordingStopped', (data) => {
+    console.log('Recording stopped:', data);
+    updateRecordingDisplay('off');
 });
 
 // End meeting
@@ -327,6 +487,12 @@ function endMeeting() {
         return;
     }
     
+    // Stop recording if active
+    if (isRecording) {
+        api.executeCommand('stopRecording', 'file');
+    }
+    
+    // First save recording info, then end meeting
     fetch('{{ route("btlive.end_meeting", $liveClass) }}', {
         method: 'POST',
         headers: {
@@ -338,7 +504,10 @@ function endMeeting() {
     .then(data => {
         if (data.success) {
             api.executeCommand('hangup');
-            window.location.href = data.redirect;
+            // Small delay to allow recording webhook to process
+            setTimeout(() => {
+                window.location.href = data.redirect;
+            }, 2000);
         }
     });
 }
