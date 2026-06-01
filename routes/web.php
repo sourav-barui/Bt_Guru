@@ -45,8 +45,9 @@ use App\Http\Controllers\Student\ExamController as StudentExamController;
 use App\Http\Controllers\Student\NotificationController as StudentNotificationController;
 use App\Http\Controllers\Student\BookController as StudentBookController;
 
-// BTLive Controller
+// BTLive Controllers
 use App\Http\Controllers\BTLiveController;
+use App\Http\Controllers\BTLiveRecordingController;
 
 /*
 |--------------------------------------------------------------------------
