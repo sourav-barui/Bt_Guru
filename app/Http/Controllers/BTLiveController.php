@@ -62,10 +62,7 @@ class BTLiveController extends Controller
         
         $tenant = Auth::user()->tenant;
         
-        // Generate unique room name
-        $roomName = $this->btliveService->generateRoomName(null, $tenant->slug);
-        
-        // Create LiveClass with BTLive enabled
+        // Create LiveClass first (without room name)
         $liveClass = LiveClass::create([
             'tenant_id' => $tenant->id,
             'course_id' => $course->id,
@@ -76,14 +73,14 @@ class BTLiveController extends Controller
             'title' => $validated['title'],
             'description' => $validated['description'] ?? null,
             'platform' => 'jitsi',
-            'meeting_url' => 'https://' . config('btlive.jitsi_domain', 'meet.jit.si') . '/' . $roomName,
+            'meeting_url' => '', // Will update after room name generation
             'scheduled_at' => $validated['scheduled_at'],
             'duration_minutes' => $validated['duration_minutes'],
             'status' => 'scheduled',
             'is_public' => $validated['is_public'] ?? false,
             // BTLive settings
             'is_btlive' => true,
-            'btlive_room_name' => $roomName,
+            'btlive_room_name' => '', // Will update after generation
             'btlive_lobby_enabled' => $validated['btlive_lobby_enabled'] ?? true,
             'btlive_waiting_room_enabled' => true,
             'btlive_chat_enabled' => $validated['btlive_chat_enabled'] ?? true,
@@ -91,6 +88,15 @@ class BTLiveController extends Controller
             'btlive_teacher_only_audio' => true,
             'btlive_attendance_enabled' => true,
             'btlive_jwt_required' => config('btlive.require_jwt', true),
+        ]);
+        
+        // Now generate room name with the created class
+        $roomName = $this->btliveService->generateRoomName($liveClass);
+        
+        // Update with room name and meeting URL
+        $liveClass->update([
+            'btlive_room_name' => $roomName,
+            'meeting_url' => 'https://' . config('btlive.jitsi_domain', 'meet.jit.si') . '/' . $roomName,
         ]);
         
         // Notify enrolled students
