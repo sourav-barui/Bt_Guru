@@ -80,6 +80,12 @@ class LiveClass extends Model
         return $this->hasMany(\App\Models\LiveClassAttendance::class)->orderBy('joined_at', 'desc');
     }
 
+    // BTLive recordings
+    public function recordings(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\BTLiveRecording::class, 'live_class_id')->orderBy('created_at', 'desc');
+    }
+
     public function getLevelLabelAttribute(): string
     {
         if ($this->lesson_id)  return 'Lesson';
