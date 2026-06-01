@@ -4,6 +4,23 @@
 
 @push('styles')
 <style>
+    /* Hide website navbar/headers */
+    body > nav, 
+    body > header,
+    .main-nav,
+    .site-header,
+    [class*="navbar"],
+    [class*="nav-header"],
+    aside.sidebar,
+    .sidebar,
+    .main-nav {
+        display: none !important;
+    }
+    body {
+        padding-top: 0 !important;
+        margin: 0 !important;
+    }
+    
     /* Auto-hide bottom action bar */
     #action-bar {
         transition: transform 0.3s ease;
@@ -89,7 +106,7 @@
         <div id="jitsi-loading" class="absolute inset-0 flex items-center justify-center bg-gray-900">
             <div class="text-center px-4">
                 <div class="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                <p class="text-white font-semibold text-sm">Joining BTLive...</p>
+                <p class="text-white font-semibold text-sm">Joining Class...</p>
                 <p class="text-gray-400 text-xs mt-1">Please wait while we connect you</p>
             </div>
         </div>
