@@ -305,6 +305,17 @@ api.addEventListener('participantLeft', (participant) => {
     updateAttendance();
 });
 
+// Screen sharing - auto toggle video
+api.addEventListener('screenSharingStatusChanged', (status) => {
+    if (status.on) {
+        // Screen sharing started - turn off video
+        api.executeCommand('toggleVideo', false);
+    } else {
+        // Screen sharing stopped - turn on video
+        api.executeCommand('toggleVideo', true);
+    }
+});
+
 // Recording status
 api.addEventListener('recordingStatusChanged', (status) => {
     console.log('Recording status:', status);

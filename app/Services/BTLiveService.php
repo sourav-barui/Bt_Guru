@@ -185,9 +185,15 @@ class BTLiveService
                     ],
                 ],
                 
-                // Audio/video defaults based on role
+                // Audio/video - Teacher only, students disabled
                 'startWithAudioMuted' => !$isModerator,
                 'startWithVideoMuted' => !$isModerator,
+                'disableAudioLevels' => !$isModerator,
+                'disableLocalVideoFlip' => !$isModerator,
+                
+                // Students: audio/video completely disabled
+                'disableVideo' => !$isModerator,
+                'disableAudio' => !$isModerator,
                 
                 // Disable features for students
                 'disableModeratorIndicator' => !$isModerator,
@@ -246,8 +252,9 @@ class BTLiveService
                         'security', 'raisehand', 'participants-pane'
                     ]
                     : [
-                        'microphone', 'camera', 'fullscreen',
-                        'hangup', 'profile', 'chat', 'raisehand', 'participants-pane'
+                        // Students: chat only (no mic, no camera)
+                        'fullscreen', 'hangup', 'profile', 'chat', 
+                        'raisehand', 'participants-pane'
                     ],
             ],
             'userInfo' => [
