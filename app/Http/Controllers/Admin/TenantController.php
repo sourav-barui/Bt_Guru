@@ -25,8 +25,8 @@ class TenantController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'coaching_name' => 'required|string|max:255',
-            'subdomain' => 'required|string|max:50|unique:tenants,subdomain|alpha_dash',
-            'email' => 'required|email|unique:tenants,email',
+            'subdomain' => 'required|string|max:50|alpha_dash|unique:tenants,subdomain,NULL,id,deleted_at,NULL',
+            'email' => 'required|email|unique:tenants,email,NULL,id,deleted_at,NULL',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
             'status' => 'required|in:active,pending,suspended',
@@ -37,9 +37,17 @@ class TenantController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
+        // Generate unique slug (including soft-deleted check)
+        $baseSlug = Str::slug($request->coaching_name);
+        $slug = $baseSlug;
+        $counter = 1;
+        while (Tenant::withTrashed()->where('slug', $slug)->exists()) {
+            $slug = $baseSlug . '-' . str_pad((string) $counter++, 3, '0', STR_PAD_LEFT);
+        }
+
         $tenant = Tenant::create([
             'coaching_name' => $request->coaching_name,
-            'slug' => Str::slug($request->coaching_name),
+            'slug' => $slug,
             'subdomain' => strtolower($request->subdomain),
             'email' => $request->email,
             'phone' => $request->phone,
@@ -67,7 +75,7 @@ class TenantController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'coaching_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:tenants,email,' . $tenant->id,
+            'email' => 'required|email|unique:tenants,email,' . $tenant->id . ',id,deleted_at,NULL',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
             'status' => 'required|in:active,pending,suspended',
@@ -78,9 +86,17 @@ class TenantController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
+        // Generate unique slug (including soft-deleted check)
+        $baseSlug = Str::slug($request->coaching_name);
+        $slug = $baseSlug;
+        $counter = 1;
+        while (Tenant::withTrashed()->where('slug', $slug)->where('id', '!=', $tenant->id)->exists()) {
+            $slug = $baseSlug . '-' . str_pad((string) $counter++, 3, '0', STR_PAD_LEFT);
+        }
+
         $tenant->update([
             'coaching_name' => $request->coaching_name,
-            'slug' => Str::slug($request->coaching_name),
+            'slug' => $slug,
             'email' => $request->email,
             'phone' => $request->phone,
             'address' => $request->address,
