@@ -46,6 +46,7 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress --no-scripts
 
 # Copy application
+# Cache bust: 2026-06-05 17:45 UTC
 COPY . .
 
 # Create production .env (overrides local .env)
