@@ -24,6 +24,6 @@ class Authenticate extends Middleware
             return route('tenant.login');
         }
 
-        return route('superadmin.login');
+        return route('admin.login');
     }
 }
