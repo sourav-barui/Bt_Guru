@@ -732,8 +732,8 @@
         if (iosHint) iosHint.classList.remove('show');
     }
 
-    // Register service worker
-    if ('serviceWorker' in navigator) {
+    // Register service worker (skip on insecure contexts)
+    if ('serviceWorker' in navigator && location.protocol === 'https:' && !location.hostname.includes('localhost')) {
         navigator.serviceWorker.register('/sw.js')
             .then(reg => console.log('SW registered:', reg))
             .catch(err => console.log('SW registration failed:', err));
