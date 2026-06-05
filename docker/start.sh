@@ -15,6 +15,9 @@ php artisan event:cache
 rm -f public/storage
 php artisan storage:link --force || true
 
+# Create downloads directory for APKs (if not exists)
+mkdir -p public/downloads
+
 # Run migrations (optional — remove if you prefer manual)
 php artisan migrate --force || true
 
