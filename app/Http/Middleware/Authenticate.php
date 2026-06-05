@@ -19,9 +19,15 @@ class Authenticate extends Middleware
         // Check if tenant subdomain
         $host = $request->getHost();
         $baseDomain = config('app.base_domain', 'btguru.test');
+        $centralDomain = config('app.central_domain', 'btguru.test');
         
         if (str_ends_with($host, '.' . $baseDomain)) {
             return route('tenant.login');
+        }
+
+        // If main domain, redirect to tenant login or return null
+        if ($host === $centralDomain) {
+            return '/login';
         }
 
         return route('admin.login');
