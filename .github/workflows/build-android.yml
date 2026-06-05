@@ -1,0 +1,87 @@
+name: Build Tenant-Specific Android APKs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'public/**'
+      - 'pwa-builder/**'
+  workflow_dispatch:
+    inputs:
+      specific_tenant:
+        description: 'Build for specific tenant slug only (leave empty for all)'
+        required: false
+        default: ''
+
+jobs:
+  build-apks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_mysql
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Bubblewrap
+        run: npm install -g @bubblewrap/cli
+
+      - name: Install dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      # Build for specific tenant or all tenants
+      - name: Build tenant APKs
+        env:
+          DB_CONNECTION: ${{ secrets.DB_CONNECTION }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          APP_URL: ${{ secrets.APP_URL }}
+          APP_KEY: ${{ secrets.APP_KEY }}
+        run: |
+          if [ -n "${{ github.event.inputs.specific_tenant }}" ]; then
+            # Build for specific tenant
+            ./pwa-builder/build-tenant-apk.sh "${{ github.event.inputs.specific_tenant }}" "${{ github.event.inputs.specific_tenant }}"
+          else
+            # Build for all active tenants
+            php artisan pwa:build-all-tenants || echo "No tenants to build"
+          fi
+        continue-on-error: true
+
+      - name: Upload all APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: tenant-apks
+          path: public/downloads/*/student.apk
+          if-no-files-found: warn
+
+      # Deploy APKs to server
+      - name: Deploy APKs to server
+        if: github.ref == 'refs/heads/main'
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "public/downloads/*"
+          target: "/var/www/html/public/downloads/"
+          strip_components: 2
+          overwrite: true

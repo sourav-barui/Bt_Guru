@@ -404,7 +404,42 @@ class RegisterController extends Controller
             }
         }
 
+        // Send welcome email with APK download link
+        $this->sendStudentWelcomeEmail($student, $request->password, $currentTenant);
+
         return redirect()->route('student.login')
-            ->with('success', 'Registration successful! You can now login.');
+            ->with('success', 'Registration successful! Check your email for login details and app download link.');
+    }
+
+    /**
+     * Send welcome email to new student with login details and APK download.
+     */
+    private function sendStudentWelcomeEmail(\App\Models\User $student, string $plainPassword, \App\Models\Tenant $tenant): void
+    {
+        $subdomain = $tenant->subdomain;
+        $centralDomain = config('app.central_domain');
+        $portalUrl = "https://{$subdomain}.{$centralDomain}";
+
+        try {
+            [$fromAddr, $fromName] = $this->applySystemMailConfig();
+
+            Mail::send([], [], function (Message $msg) use ($student, $tenant, $portalUrl, $plainPassword, $fromAddr, $fromName, $subdomain) {
+                $fromEmail = $fromAddr ?? "noreply@{$subdomain}.{$centralDomain}";
+                $fromDisplay = $fromName ?? $tenant->coaching_name ?? 'BT Guru';
+
+                $msg->to($student->email, $student->name)
+                    ->from($fromEmail, $fromDisplay)
+                    ->subject("Welcome to {$tenant->coaching_name} - Student Portal Access")
+                    ->html(view('emails.student_welcome', [
+                        'student' => $student,
+                        'tenant' => $tenant,
+                        'password' => $plainPassword,
+                        'loginUrl' => "{$portalUrl}/login",
+                        'downloadUrl' => "{$portalUrl}/downloads/{$tenant->subdomain}/student.apk",
+                    ])->render());
+            });
+        } catch (\Throwable $e) {
+            \Log::warning('Student welcome email failed: ' . $e->getMessage());
+        }
     }
 }

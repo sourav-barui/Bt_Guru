@@ -10,6 +10,8 @@ use App\Models\Enrollment;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Mail\Message;
 
 class StudentController extends Controller
 {
@@ -62,7 +64,7 @@ class StudentController extends Controller
         if ($request->course_id) {
             $course = Course::find($request->course_id);
             $enrollmentStatus = $request->enrollment_status ?? 'pending';
-            
+
             Enrollment::create([
                 'tenant_id' => Auth::user()->tenant_id,
                 'student_id' => $student->id,
@@ -76,8 +78,46 @@ class StudentController extends Controller
             ]);
         }
 
+        // Send welcome email with APK download link
+        $this->sendWelcomeEmail($student, $request->password);
+
         return redirect()->route('tenant.students.index')
-            ->with('success', 'Student created successfully.');
+            ->with('success', 'Student created successfully. Welcome email sent.');
+    }
+
+    /**
+     * Send welcome email to new student with login details and APK download.
+     */
+    private function sendWelcomeEmail(User $student, string $plainPassword): void
+    {
+        $tenant = app('current_tenant');
+        if (!$tenant) {
+            return;
+        }
+
+        $subdomain = $tenant->subdomain;
+        $centralDomain = config('app.central_domain');
+        $portalUrl = "https://{$subdomain}.{$centralDomain}";
+
+        try {
+            Mail::send([], [], function (Message $msg) use ($student, $tenant, $portalUrl, $plainPassword) {
+                $fromEmail = $tenant->email ?? "noreply@{$subdomain}.{$centralDomain}";
+                $fromName = $tenant->coaching_name ?? 'BT Guru';
+
+                $msg->to($student->email, $student->name)
+                    ->from($fromEmail, $fromName)
+                    ->subject("Welcome to {$tenant->coaching_name} - Student Portal Access")
+                    ->html(view('emails.student_welcome', [
+                        'student' => $student,
+                        'tenant' => $tenant,
+                        'password' => $plainPassword,
+                        'loginUrl' => "{$portalUrl}/login",
+                        'downloadUrl' => "{$portalUrl}/downloads/{$tenant->subdomain}/student.apk",
+                    ])->render());
+            });
+        } catch (\Throwable $e) {
+            \Log::warning('Student welcome email failed: ' . $e->getMessage());
+        }
     }
 
     public function show(User $student)

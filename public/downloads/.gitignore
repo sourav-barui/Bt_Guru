@@ -1,0 +1,5 @@
+# Ignore all files except this .gitignore
+*
+!.gitignore
+# APK files will be uploaded here after build
+# Place btguru-student.apk in this directory

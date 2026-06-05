@@ -512,16 +512,29 @@
                 </button>
             </div>
             <div class="notif-list" id="profileMenuList">
-                <!-- Install App Option -->
-                <div id="installAppOption" class="notif-item" onclick="installApp()" style="cursor: pointer;">
+                <!-- Download APK Option - ALWAYS VISIBLE -->
+                <a href="{{ route('student.download-app') }}" class="notif-item" style="text-decoration: none; color: inherit;">
                     <div class="notif-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
                         <svg width="20" height="20" fill="none" stroke="white" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                         </svg>
                     </div>
                     <div class="notif-content">
-                        <div class="notif-title">Install App</div>
-                        <div class="notif-desc">Add to home screen</div>
+                        <div class="notif-title" style="color: #059669; font-weight: 700;">Download App</div>
+                        <div class="notif-desc">Get Android APK</div>
+                    </div>
+                </a>
+
+                <!-- Install App Option (PWA) - Hidden if already installed -->
+                <div id="installAppOption" class="notif-item" onclick="installApp()" style="cursor: pointer;">
+                    <div class="notif-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                        <svg width="20" height="20" fill="none" stroke="white" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                    </div>
+                    <div class="notif-content">
+                        <div class="notif-title">Add to Home Screen</div>
+                        <div class="notif-desc">Quick install (no download)</div>
                     </div>
                 </div>
 

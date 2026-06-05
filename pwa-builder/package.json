@@ -1,0 +1,14 @@
+{
+  "name": "btguru-android-builder",
+  "version": "1.0.0",
+  "description": "Auto-build Android APK from BT Guru PWA",
+  "scripts": {
+    "init": "bubblewrap init --manifest https://btguru.tech/manifest.json --directory android-app",
+    "build": "cd android-app && bubblewrap build",
+    "build:debug": "cd android-app && bubblewrap build --debug",
+    "update": "cd android-app && bubblewrap update"
+  },
+  "devDependencies": {
+    "@bubblewrap/cli": "^1.21.0"
+  }
+}

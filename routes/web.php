@@ -630,5 +630,10 @@ if (!$isAdminSubdomain && !$isCentralDomain) {
 
         // About Page
         Route::get('/about', [StudentDashboardController::class, 'about'])->name('student.about');
+
+        // App Download Page
+        Route::get('/download-app', function() {
+            return view('student.download');
+        })->name('student.download-app');
     });
 }
