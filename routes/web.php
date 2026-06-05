@@ -588,6 +588,22 @@ if (!$isAdminSubdomain && !$isCentralDomain) {
         Route::get('/live-classes', [StudentLiveClassController::class, 'index'])->name('student.live_classes.index');
         
         // BTLive Student
+        Route::get('/btlive/test', function() {
+            return 'TEST ROUTE WORKS - Student ID: ' . (Auth::id() ?? 'not logged in');
+        });
+        Route::get('/btlive/{liveClass}/join-simple', function($liveClassId) {
+            $class = \App\Models\LiveClass::find($liveClassId);
+            if (!$class) return 'Class not found: ' . $liveClassId;
+            return 'SIMPLE JOIN WORKS - Class: ' . $class->title . ' (ID: ' . $class->id . ')';
+        });
+        // TEMPORARY: Working simple join that renders the view
+        Route::get('/btlive/{id}/join-new', function($id) {
+            $liveClass = \App\Models\LiveClass::findOrFail($id);
+            $student = Auth::user();
+            $jwt = '';
+            $jitsiConfig = ['domain' => 'meet.jit.si', 'roomName' => $liveClass->btlive_room_name ?? 'test-room'];
+            return view('btlive.student_room_simple', compact('liveClass', 'jwt', 'jitsiConfig'));
+        })->name('student.btlive.join.new');
         Route::get('/btlive/{liveClass}/join', [BTLiveController::class, 'studentRoom'])->name('student.btlive.join');
         Route::post('/btlive/{liveClass}/leave', [BTLiveController::class, 'studentLeave'])->name('student.btlive.leave');
 
