@@ -46,7 +46,7 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress --no-scripts
 
 # Copy application
-# Cache bust: 2026-06-05 17:45 UTC
+# Cache bust: 2026-06-05 18:15 UTC
 COPY . .
 
 # Create production .env (overrides local .env)
@@ -56,6 +56,7 @@ RUN echo "APP_NAME=Bt_Guru" > .env && \
     echo "APP_KEY=base64:4XUYkqQw2E6rSifjMPitm5VYnvB8VePOM2DMBQykpaE=" >> .env && \
     echo "APP_URL=https://btguru.tech" >> .env && \
     echo "CENTRAL_DOMAIN=btguru.tech" >> .env && \
+    echo "BASE_DOMAIN=btguru.tech" >> .env && \
     echo "ADMIN_SUBDOMAIN=admin" >> .env && \
     echo "DB_CONNECTION=mysql" >> .env && \
     echo "DB_HOST=btguru-btgurudb-red7t9" >> .env && \
