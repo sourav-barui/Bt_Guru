@@ -157,13 +157,13 @@ class BTLiveController extends Controller
      */
     public function studentRoom(LiveClass $liveClass)
     {
-        // IMMEDIATE TEST - if you see this, PHP is working
-        return response('DEBUG: Code is running. Class ID: ' . $liveClass->id, 200);
+        // Debug test (comment out for production)
+        // return response('DEBUG: Code is running. Class ID: ' . $liveClass->id, 200);
         
         try {
             $student = Auth::user();
             if (!$student) {
-                return response('STEP 1: Not authenticated', 500);
+                return redirect()->route('login')->with('error', 'Please login to join the class.');
             }
             
             // Check if student can access this class
