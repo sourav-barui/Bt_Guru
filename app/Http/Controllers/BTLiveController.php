@@ -157,6 +157,9 @@ class BTLiveController extends Controller
      */
     public function studentRoom(LiveClass $liveClass)
     {
+        // IMMEDIATE TEST - if you see this, PHP is working
+        return response('DEBUG: Code is running. Class ID: ' . $liveClass->id, 200);
+        
         try {
             $student = Auth::user();
             if (!$student) {
