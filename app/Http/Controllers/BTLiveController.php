@@ -159,32 +159,58 @@ class BTLiveController extends Controller
     {
         try {
             $student = Auth::user();
+            if (!$student) {
+                return response('STEP 1: Not authenticated', 500);
+            }
             
             // Check if student can access this class
             if (!$this->canStudentAccess($liveClass, $student)) {
-                abort(403, 'You are not authorized to join this class.');
+                return response('STEP 2: Access denied - tenant=' . $liveClass->tenant_id . ' student_tenant=' . $student->tenant_id . ' is_public=' . ($liveClass->is_public ? 'yes' : 'no'), 500);
             }
             
             // Ensure this is a BTLive class
             if (!$liveClass->is_btlive) {
-                return redirect()->route('student.live_classes.index')
-                    ->with('error', 'This class is not available for BTLive.');
+                return response('STEP 3: Not BTLive class', 500);
             }
             
             // Check if class is live or scheduled
             if (!in_array($liveClass->status, ['live', 'scheduled'])) {
-                return redirect()->route('student.live_classes.index')
-                    ->with('error', 'This class is not currently active.');
+                return response('STEP 4: Class not active, status=' . $liveClass->status, 500);
+            }
+            
+            // Check room name exists
+            if (empty($liveClass->btlive_room_name)) {
+                return response('STEP 5: No room name set', 500);
             }
             
             // Generate student token
-            $jwt = $this->btliveService->generateStudentToken($liveClass, $student);
+            try {
+                $jwt = $this->btliveService->generateStudentToken($liveClass, $student);
+            } catch (\Throwable $jwtError) {
+                return response('STEP 6 JWT Error: ' . $jwtError->getMessage(), 500);
+            }
             
             // Get Jitsi config
-            $jitsiConfig = $this->btliveService->getJitsiConfig($liveClass, $student, false);
+            try {
+                $jitsiConfig = $this->btliveService->getJitsiConfig($liveClass, $student, false);
+            } catch (\Throwable $configError) {
+                return response('STEP 7 Config Error: ' . $configError->getMessage(), 500);
+            }
+            
+            // Check config has required fields
+            if (empty($jitsiConfig['domain'])) {
+                return response('STEP 8: Missing domain in config', 500);
+            }
+            if (empty($jitsiConfig['roomName'])) {
+                return response('STEP 9: Missing roomName in config', 500);
+            }
             
             // Record attendance (join)
-            $this->recordAttendance($liveClass, $student, 'join');
+            try {
+                $this->recordAttendance($liveClass, $student, 'join');
+            } catch (\Throwable $attError) {
+                // Non-fatal, continue
+            }
             
             return view('btlive.student_room', compact(
                 'liveClass',
@@ -196,7 +222,7 @@ class BTLiveController extends Controller
                 'liveClass' => $liveClass->id ?? null,
                 'trace' => $e->getTraceAsString()
             ]);
-            return response('Error loading classroom: ' . $e->getMessage(), 500);
+            return response('FATAL ERROR: ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine(), 500);
         }
     }
     
