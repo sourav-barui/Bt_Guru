@@ -38,8 +38,8 @@ cd "$OUTPUT_DIR"
 if [ ! -f "twa-manifest.json" ]; then
     echo "Initializing TWA project for $COACHING_NAME..."
     
-    # Create init answers
-    printf '%s\n%s\n%s\n%s\n%s\n%s\nn\n' \
+    # Create init answers (with JDK path for non-interactive mode)
+    printf '%s\n%s\n%s\n%s\n%s\n%s\nn\n/usr/lib/jvm/java-17-openjdk\n' \
         "$COACHING_NAME" \
         "$PACKAGE_NAME" \
         "$COACHING_NAME Student App" \

@@ -18,7 +18,8 @@ RUN apk add --no-cache \
     mysql-client \
     bash \
     nodejs \
-    npm
+    npm \
+    openjdk17
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
@@ -46,7 +47,7 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress --no-scripts
 
 # Copy application
-# Cache bust: 2026-06-05 18:45 UTC
+# Cache bust: 2026-06-05 19:20 UTC - Added OpenJDK17 for APK builds
 COPY . .
 
 # Create production .env (overrides local .env)
