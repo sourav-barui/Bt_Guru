@@ -5,6 +5,7 @@ cd /var/www/html
 
 # Clear any stale caches
 php artisan optimize:clear || true
+php artisan route:clear || true
 
 # Cache Laravel configs (but NOT routes - conditional routing breaks route cache)
 php artisan config:cache
