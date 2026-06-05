@@ -157,39 +157,47 @@ class BTLiveController extends Controller
      */
     public function studentRoom(LiveClass $liveClass)
     {
-        $student = Auth::user();
-        
-        // Check if student can access this class
-        if (!$this->canStudentAccess($liveClass, $student)) {
-            abort(403, 'You are not authorized to join this class.');
+        try {
+            $student = Auth::user();
+            
+            // Check if student can access this class
+            if (!$this->canStudentAccess($liveClass, $student)) {
+                abort(403, 'You are not authorized to join this class.');
+            }
+            
+            // Ensure this is a BTLive class
+            if (!$liveClass->is_btlive) {
+                return redirect()->route('student.live_classes.index')
+                    ->with('error', 'This class is not available for BTLive.');
+            }
+            
+            // Check if class is live or scheduled
+            if (!in_array($liveClass->status, ['live', 'scheduled'])) {
+                return redirect()->route('student.live_classes.index')
+                    ->with('error', 'This class is not currently active.');
+            }
+            
+            // Generate student token
+            $jwt = $this->btliveService->generateStudentToken($liveClass, $student);
+            
+            // Get Jitsi config
+            $jitsiConfig = $this->btliveService->getJitsiConfig($liveClass, $student, false);
+            
+            // Record attendance (join)
+            $this->recordAttendance($liveClass, $student, 'join');
+            
+            return view('btlive.student_room', compact(
+                'liveClass',
+                'jwt',
+                'jitsiConfig'
+            ));
+        } catch (\Throwable $e) {
+            Log::error('BTLive student room error: ' . $e->getMessage(), [
+                'liveClass' => $liveClass->id ?? null,
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response('Error loading classroom: ' . $e->getMessage(), 500);
         }
-        
-        // Ensure this is a BTLive class
-        if (!$liveClass->is_btlive) {
-            return redirect()->route('student.live_classes.index')
-                ->with('error', 'This class is not available for BTLive.');
-        }
-        
-        // Check if class is live or scheduled
-        if (!in_array($liveClass->status, ['live', 'scheduled'])) {
-            return redirect()->route('student.live_classes.index')
-                ->with('error', 'This class is not currently active.');
-        }
-        
-        // Generate student token
-        $jwt = $this->btliveService->generateStudentToken($liveClass, $student);
-        
-        // Get Jitsi config
-        $jitsiConfig = $this->btliveService->getJitsiConfig($liveClass, $student, false);
-        
-        // Record attendance (join)
-        $this->recordAttendance($liveClass, $student, 'join');
-        
-        return view('btlive.student_room', compact(
-            'liveClass',
-            'jwt',
-            'jitsiConfig'
-        ));
     }
     
     /**
