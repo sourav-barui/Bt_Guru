@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\PaymentRequest;
 use App\Models\CourseSubscription;
+use App\Models\MonthlyFee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -38,19 +39,20 @@ class PaymentController extends Controller
 
         // Generate past months data for each enrollment
         $enrollmentsWithMonths = $enrollments->map(function ($enrollment) {
-            $enrollmentStart = $enrollment->enrolled_at ?? $enrollment->created_at;
-            $startDate = Carbon::parse($enrollmentStart)->startOfMonth();
+            // Use course start date for past months calculation
+            $courseStart = $enrollment->course->start_date ?? $enrollment->enrolled_at ?? $enrollment->created_at;
+            $startDate = Carbon::parse($courseStart)->startOfMonth();
             $endDate = Carbon::now()->startOfMonth();
             
             $months = [];
             $current = $startDate->copy();
             
-            // Get already paid months for this enrollment
-            $paidSubscriptions = CourseSubscription::where('enrollment_id', $enrollment->id)
-                ->where('payment_status', 'paid')
+            // Get already paid months for this enrollment from MonthlyFee table
+            $paidMonths = MonthlyFee::where('enrollment_id', $enrollment->id)
+                ->where('status', 'paid')
                 ->get()
-                ->map(function ($sub) {
-                    return $sub->access_start->format('Y-m');
+                ->map(function ($fee) {
+                    return $fee->year . '-' . str_pad($fee->month, 2, '0', STR_PAD_LEFT);
                 })
                 ->toArray();
             
@@ -60,7 +62,7 @@ class PaymentController extends Controller
                     'year' => $current->year,
                     'month' => $current->month,
                     'month_name' => $current->format('F Y'),
-                    'is_paid' => in_array($monthKey, $paidSubscriptions),
+                    'is_paid' => in_array($monthKey, $paidMonths),
                     'month_key' => $monthKey,
                 ];
                 $current->addMonth();

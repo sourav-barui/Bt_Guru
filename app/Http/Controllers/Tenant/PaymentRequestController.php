@@ -72,50 +72,74 @@ class PaymentRequestController extends Controller
 
                 // Handle monthly fee payments
                 if ($payment->payment_type === 'monthly' || $payment->payment_type === 'past_month') {
-                    // Use current month/year if not set
-                    $monthNum = $payment->month_number ?? now()->month;
-                    $yearNum = $payment->year_number ?? now()->year;
+                    // Get all months to process from metadata
+                    $monthsToProcess = [];
+                    $metadata = json_decode($payment->metadata ?? '{}', true);
                     
-                    // Find or create monthly fee record
-                    $monthlyFee = MonthlyFee::firstOrCreate(
-                        [
-                            'enrollment_id' => $enrollment->id,
+                    if ($payment->payment_type === 'past_month' && !empty($metadata['past_months'])) {
+                        foreach ($metadata['past_months'] as $monthKey) {
+                            [$year, $month] = explode('-', $monthKey);
+                            $monthsToProcess[] = ['year' => (int)$year, 'month' => (int)$month];
+                        }
+                    } else {
+                        $monthsToProcess[] = [
+                            'year' => $payment->year_number ?? now()->year,
+                            'month' => $payment->month_number ?? now()->month
+                        ];
+                    }
+
+                    // Calculate per-month amount
+                    $perMonthAmount = $payment->amount / count($monthsToProcess);
+
+                    // Process each month
+                    foreach ($monthsToProcess as $monthData) {
+                        $yearNum = $monthData['year'];
+                        $monthNum = $monthData['month'];
+
+                        // Find or create monthly fee record
+                        $monthlyFee = MonthlyFee::firstOrCreate(
+                            [
+                                'enrollment_id' => $enrollment->id,
+                                'month' => $monthNum,
+                                'year' => $yearNum,
+                            ],
+                            [
+                                'tenant_id' => $payment->tenant_id,
+                                'student_id' => $payment->student_id,
+                                'amount' => $perMonthAmount,
+                                'status' => 'pending',
+                            ]
+                        );
+
+                        // Mark as paid
+                        $monthlyFee->markAsPaid('online', $payment->reference_number);
+
+                        // Create subscription with access window for that specific month
+                        $accessStart = Carbon::create($yearNum, $monthNum, 1)->startOfDay();
+                        $accessEnd = $accessStart->copy()->endOfMonth()->endOfDay();
+
+                        \Log::info('Creating subscription (existing enrollment)', [
+                            'payment_id' => $payment->id,
                             'month' => $monthNum,
                             'year' => $yearNum,
-                        ],
-                        [
-                            'tenant_id' => $payment->tenant_id,
-                            'student_id' => $payment->student_id,
-                            'amount' => $payment->amount,
-                            'status' => 'pending',
-                        ]
-                    );
+                            'accessStart' => $accessStart->toDateTimeString(),
+                            'accessEnd' => $accessEnd->toDateTimeString(),
+                        ]);
 
-                    // Mark as paid
-                    $monthlyFee->markAsPaid('online', $payment->reference_number);
-
-                    // Create 30-day access window subscription starting from now
-                    $accessStart = Carbon::now()->startOfSecond();
-                    $accessEnd = Carbon::now()->addDays(30)->startOfSecond();
-                    
-                    \Log::info('Creating subscription (existing enrollment)', [
-                        'accessStart' => $accessStart->toDateTimeString(),
-                        'accessEnd' => $accessEnd->toDateTimeString(),
-                    ]);
-                    
-                    CourseSubscription::create([
-                        'tenant_id'       => $payment->tenant_id,
-                        'enrollment_id'   => $enrollment->id,
-                        'student_id'      => $payment->student_id,
-                        'course_id'       => $payment->course_id,
-                        'access_start'    => $accessStart,
-                        'access_end'      => $accessEnd,
-                        'type'            => 'monthly',
-                        'fee_paid'        => $payment->amount,
-                        'payment_status'  => 'paid',
-                        'remarks'         => "Monthly fee for {$monthNum}/{$yearNum}",
-                        'created_by'      => Auth::id(),
-                    ]);
+                        CourseSubscription::create([
+                            'tenant_id'       => $payment->tenant_id,
+                            'enrollment_id'   => $enrollment->id,
+                            'student_id'      => $payment->student_id,
+                            'course_id'       => $payment->course_id,
+                            'access_start'    => $accessStart,
+                            'access_end'      => $accessEnd,
+                            'type'            => $payment->payment_type === 'past_month' ? 'past' : 'monthly',
+                            'fee_paid'        => $perMonthAmount,
+                            'payment_status'  => 'paid',
+                            'remarks'         => "Monthly fee for {$monthNum}/{$yearNum}",
+                            'created_by'      => Auth::id(),
+                        ]);
+                    }
                 }
             }
         } elseif ($payment->payment_type === 'enrollment') {
@@ -138,17 +162,6 @@ class PaymentRequestController extends Controller
             }
         } elseif ($payment->payment_type === 'monthly' || $payment->payment_type === 'past_month') {
             // Monthly fee payment - check for existing enrollment first
-            // Use current month/year if not set
-            $monthNumber = $payment->month_number ?? now()->month;
-            $yearNumber = $payment->year_number ?? now()->year;
-            
-            \Log::info('Processing monthly payment approval', [
-                'payment_id' => $payment->id,
-                'type' => $payment->payment_type,
-                'month' => $monthNumber,
-                'year' => $yearNumber,
-                'has_enrollment_id' => $payment->enrollment_id ? 'yes' : 'no',
-            ]);
             $course = Course::find($payment->course_id);
             if ($course) {
                 // Find existing enrollment or create new one
@@ -185,51 +198,84 @@ class PaymentRequestController extends Controller
                 }
 
                 $payment->update(['enrollment_id' => $enrollment->id]);
-                \Log::info('Monthly payment enrollment linked', [
-                    'payment_id' => $payment->id,
-                    'enrollment_id' => $enrollment->id,
-                    'enrollment_status' => $enrollment->enrollment_status,
-                ]);
 
-                // Create monthly fee record and mark as paid
-                $monthlyFee = MonthlyFee::firstOrCreate(
-                    [
-                        'enrollment_id' => $enrollment->id,
+                // Get all months to process
+                $monthsToProcess = [];
+                $metadata = json_decode($payment->metadata ?? '{}', true);
+                
+                if ($payment->payment_type === 'past_month' && !empty($metadata['past_months'])) {
+                    // Process all past months from metadata
+                    foreach ($metadata['past_months'] as $monthKey) {
+                        [$year, $month] = explode('-', $monthKey);
+                        $monthsToProcess[] = ['year' => (int)$year, 'month' => (int)$month];
+                    }
+                } else {
+                    // Single month payment (regular monthly or single past month)
+                    $monthsToProcess[] = [
+                        'year' => $payment->year_number ?? now()->year,
+                        'month' => $payment->month_number ?? now()->month
+                    ];
+                }
+
+                // Calculate per-month amount
+                $perMonthAmount = $payment->amount / count($monthsToProcess);
+
+                // Process each month
+                foreach ($monthsToProcess as $monthData) {
+                    $yearNumber = $monthData['year'];
+                    $monthNumber = $monthData['month'];
+
+                    \Log::info('Processing monthly payment approval', [
+                        'payment_id' => $payment->id,
+                        'type' => $payment->payment_type,
                         'month' => $monthNumber,
                         'year' => $yearNumber,
-                    ],
-                    [
-                        'tenant_id' => $payment->tenant_id,
-                        'student_id' => $payment->student_id,
-                        'amount' => $payment->amount,
-                        'status' => 'pending',
-                    ]
-                );
-                $monthlyFee->markAsPaid('online', $payment->reference_number);
+                        'enrollment_id' => $enrollment->id,
+                    ]);
 
-                // Create 30-day access window subscription starting from now
-                $accessStart = Carbon::now()->startOfSecond();
-                $accessEnd = Carbon::now()->addDays(30)->startOfSecond();
-                
-                \Log::info('Creating subscription', [
-                    'accessStart' => $accessStart->toDateTimeString(),
-                    'accessEnd' => $accessEnd->toDateTimeString(),
-                    'timestamp' => now()->toDateTimeString(),
-                ]);
-                
-                CourseSubscription::create([
-                    'tenant_id'       => $payment->tenant_id,
-                    'enrollment_id'   => $enrollment->id,
-                    'student_id'      => $payment->student_id,
-                    'course_id'       => $payment->course_id,
-                    'access_start'    => $accessStart,
-                    'access_end'      => $accessEnd,
-                    'type'            => 'monthly',
-                    'fee_paid'        => $payment->amount,
-                    'payment_status'  => 'paid',
-                    'remarks'         => "Monthly fee for {$monthNumber}/{$yearNumber}",
-                    'created_by'      => Auth::id(),
-                ]);
+                    // Create monthly fee record and mark as paid
+                    $monthlyFee = MonthlyFee::firstOrCreate(
+                        [
+                            'enrollment_id' => $enrollment->id,
+                            'month' => $monthNumber,
+                            'year' => $yearNumber,
+                        ],
+                        [
+                            'tenant_id' => $payment->tenant_id,
+                            'student_id' => $payment->student_id,
+                            'amount' => $perMonthAmount,
+                            'status' => 'pending',
+                        ]
+                    );
+                    $monthlyFee->markAsPaid('online', $payment->reference_number);
+
+                    // Create subscription with access window for that specific month
+                    // Access starts from 1st day of the month and ends on last day
+                    $accessStart = Carbon::create($yearNumber, $monthNumber, 1)->startOfDay();
+                    $accessEnd = $accessStart->copy()->endOfMonth()->endOfDay();
+
+                    \Log::info('Creating subscription', [
+                        'payment_id' => $payment->id,
+                        'month' => $monthNumber,
+                        'year' => $yearNumber,
+                        'accessStart' => $accessStart->toDateTimeString(),
+                        'accessEnd' => $accessEnd->toDateTimeString(),
+                    ]);
+
+                    CourseSubscription::create([
+                        'tenant_id'       => $payment->tenant_id,
+                        'enrollment_id'   => $enrollment->id,
+                        'student_id'      => $payment->student_id,
+                        'course_id'       => $payment->course_id,
+                        'access_start'    => $accessStart,
+                        'access_end'      => $accessEnd,
+                        'type'            => $payment->payment_type === 'past_month' ? 'past' : 'monthly',
+                        'fee_paid'        => $perMonthAmount,
+                        'payment_status'  => 'paid',
+                        'remarks'         => "Monthly fee for {$monthNumber}/{$yearNumber}",
+                        'created_by'      => Auth::id(),
+                    ]);
+                }
             }
         }
 
