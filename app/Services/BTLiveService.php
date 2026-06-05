@@ -385,9 +385,9 @@ class BTLiveService
         $averageDuration = $attendance->avg('duration_seconds') ?? 0;
         
         // Calculate attendance percentage
-        $enrolledCount = $liveClass->course->enrollments()
+        $enrolledCount = $liveClass->course?->enrollments()
             ->where('enrollment_status', 'active')
-            ->count();
+            ->count() ?? 0;
             
         $attendancePercentage = $enrolledCount > 0 
             ? round(($presentStudents / $enrolledCount) * 100, 2)

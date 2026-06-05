@@ -40,7 +40,7 @@
     
     function leaveMeeting() {
         api.executeCommand('hangup');
-        window.location.href = '{{ route('tenant.live_classes.index', $liveClass->course_id) }}';
+        window.location.href = '{{ route('student.live_classes.index') }}';
     }
 </script>
 @endpush
