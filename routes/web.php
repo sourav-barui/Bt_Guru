@@ -233,17 +233,6 @@ if (!$isAdminSubdomain && !$isCentralDomain) {
     Route::get('/student/register', [RegisterController::class, 'showStudentRegistration'])->name('student.register');
     Route::post('/student/register', [RegisterController::class, 'studentRegister']);
 
-    // Student App Download (accessible on main domain)
-    Route::get('/student/download-app', function() {
-        // Set a mock tenant for main domain access
-        if (!app()->has('current_tenant')) {
-            app()->bind('current_tenant', function() {
-                return null;
-            });
-        }
-        return view('student.download');
-    })->name('student.download-app.public');
-
     // Shared Logout
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
