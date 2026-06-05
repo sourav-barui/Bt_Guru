@@ -513,7 +513,7 @@
             </div>
             <div class="notif-list" id="profileMenuList">
                 <!-- Download APK Option - ALWAYS VISIBLE -->
-                <a href="/student/download-app" class="notif-item" style="text-decoration: none; color: inherit; display: flex !important;">
+                <a href="{{ url('/student/download-app') }}" class="notif-item" style="text-decoration: none; color: inherit; display: flex !important;">
                     <div class="notif-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
                         <svg width="20" height="20" fill="none" stroke="white" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
