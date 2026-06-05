@@ -111,11 +111,11 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-sm">
-                                        {{ strtoupper(substr($record->student->name, 0, 1)) }}
+                                        {{ $record->student ? strtoupper(substr($record->student->name, 0, 1)) : '?' }}
                                     </div>
                                     <div>
-                                        <p class="font-medium text-gray-900">{{ $record->student->name }}</p>
-                                        <p class="text-xs text-gray-500">{{ $record->student->email }}</p>
+                                        <p class="font-medium text-gray-900">{{ $record->student?->name ?? $record->display_name ?? 'Unknown' }}</p>
+                                        <p class="text-xs text-gray-500">{{ $record->student?->email ?? 'N/A' }}</p>
                                     </div>
                                 </div>
                             </td>
@@ -216,8 +216,8 @@ function exportAttendance() {
     const rows = [
         ['Student Name', 'Email', 'Joined At', 'Left At', 'Duration (min)', 'Device', 'OS', 'Status'],
         @json($attendance->map(fn($r) => [
-            $r->student->name,
-            $r->student->email,
+            $r->student?->name ?? $r->display_name ?? 'Unknown',
+            $r->student?->email ?? 'N/A',
             $r->joined_at->format('Y-m-d H:i:s'),
             $r->left_at?->format('Y-m-d H:i:s') ?? 'In Progress',
             floor($r->duration_seconds / 60),

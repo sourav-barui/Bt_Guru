@@ -95,20 +95,20 @@
                             <div class="flex space-x-2">
                                 @if($recording->status === 'completed')
                                     @if(!$recording->is_approved)
-                                        <form action="{{ route('tenant.btlive.recordings.approve', ['tenant' => $liveClass->course->tenant->slug ?? 'default', 'recording' => $recording->id]) }}" method="POST" class="inline">
+                                        <form action="{{ route('tenant.btlive.recordings.approve', ['recording' => $recording->id]) }}" method="POST" class="inline">
                                             @csrf
                                             <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs">
                                                 Approve
                                             </button>
                                         </form>
-                                        <form action="{{ route('tenant.btlive.recordings.reject', ['tenant' => $liveClass->course->tenant->slug ?? 'default', 'recording' => $recording->id]) }}" method="POST" class="inline">
+                                        <form action="{{ route('tenant.btlive.recordings.reject', ['recording' => $recording->id]) }}" method="POST" class="inline">
                                             @csrf
                                             <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">
                                                 Reject
                                             </button>
                                         </form>
                                     @endif
-                                    <a href="{{ route('tenant.btlive.recordings.download', ['tenant' => $liveClass->course->tenant->slug ?? 'default', 'recording' => $recording->id]) }}" 
+                                    <a href="{{ route('tenant.btlive.recordings.download', ['recording' => $recording->id]) }}" 
                                        class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs"
                                        target="_blank">
                                         Download

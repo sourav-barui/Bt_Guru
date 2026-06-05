@@ -156,6 +156,7 @@ class BTLiveService
     public function getJitsiConfig(LiveClass $liveClass, User $user, bool $isModerator = false): array
     {
         $config = [
+            'domain' => $this->jitsiDomain,
             'roomName' => $liveClass->btlive_room_name,
             'width' => '100%',
             'height' => '100%',
