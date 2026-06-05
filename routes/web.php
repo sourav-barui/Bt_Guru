@@ -554,7 +554,19 @@ if (!$isAdminSubdomain && !$isCentralDomain) {
 
     /*
     |--------------------------------------------------------------------------
-    | Student Routes
+    | Public Student Routes (No Auth Required)
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('student')->group(function () {
+        // App Download Page - Public
+        Route::get('/download-app', function() {
+            return view('student.download');
+        })->name('student.download-app.public');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Protected Student Routes (Auth Required)
     |--------------------------------------------------------------------------
     */
     Route::middleware(['auth', 'role:student', 'single.session'])->prefix('student')->group(function () {
@@ -630,10 +642,5 @@ if (!$isAdminSubdomain && !$isCentralDomain) {
 
         // About Page
         Route::get('/about', [StudentDashboardController::class, 'about'])->name('student.about');
-
-        // App Download Page
-        Route::get('/download-app', function() {
-            return view('student.download');
-        })->name('student.download-app');
     });
 }
