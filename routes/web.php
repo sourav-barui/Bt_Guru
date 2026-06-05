@@ -235,6 +235,12 @@ if (!$isAdminSubdomain && !$isCentralDomain) {
 
     // Student App Download (accessible on main domain)
     Route::get('/student/download-app', function() {
+        // Set a mock tenant for main domain access
+        if (!app()->has('current_tenant')) {
+            app()->bind('current_tenant', function() {
+                return null;
+            });
+        }
         return view('student.download');
     })->name('student.download-app.public');
 
