@@ -34,21 +34,79 @@ OUTPUT_DIR="android-apps/$TENANT_SLUG"
 mkdir -p "$OUTPUT_DIR"
 cd "$OUTPUT_DIR"
 
-# Initialize TWA project (only first time)
+# Create TWA manifest directly (non-interactive)
 if [ ! -f "twa-manifest.json" ]; then
-    echo "Initializing TWA project for $COACHING_NAME..."
+    echo "Creating TWA manifest for $COACHING_NAME..."
     
-    # Create init answers (with JDK path for non-interactive mode)
-    printf '%s\n%s\n%s\n%s\n%s\n%s\nn\n/usr/lib/jvm/java-17-openjdk\n' \
-        "$COACHING_NAME" \
-        "$PACKAGE_NAME" \
-        "$COACHING_NAME Student App" \
-        "https://$TENANT_DOMAIN" \
-        "$TENANT_DOMAIN" \
-        "$TENANT_DOMAIN" | bubblewrap init --manifest "$MANIFEST_URL" --directory .
+    cat > twa-manifest.json << EOF
+{
+  "packageId": "$PACKAGE_NAME",
+  "host": "$TENANT_DOMAIN",
+  "name": "$COACHING_NAME",
+  "launcherName": "$COACHING_NAME",
+  "display": "standalone",
+  "themeColor": "$THEME_COLOR",
+  "navigationColor": "$THEME_COLOR",
+  "navigationColorDark": "$THEME_COLOR",
+  "navigationDividerColor": "$THEME_COLOR",
+  "backgroundColor": "$THEME_COLOR",
+  "enableNotifications": true,
+  "shortcuts": [],
+  "iconPath": "app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+  "maskableIconPath": "app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
+  "monochromeIconPath": "app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
+  "appVersion": "1.0.0",
+  "appVersionCode": 1,
+  "fullScopeUrl": "https://$TENANT_DOMAIN",
+  "minSdkVersion": 19,
+  "targetSdkVersion": 34,
+  "compileSdkVersion": 34,
+  "gradleVersion": "8.0.0",
+  "androidBuildToolsVersion": "34.0.0",
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "shareTarget": {},
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "$MANIFEST_URL"
+}
+EOF
+    
+    # Download manifest and icons
+    echo "Downloading manifest from $MANIFEST_URL..."
+    curl -s "$MANIFEST_URL" -o manifest.json || echo "Warning: Could not download manifest"
+    
+    # Create build.gradle with JDK path
+    mkdir -p app
+    cat > app/build.gradle << 'GRADLEEOF'
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.google.androidbrowserhelper'
+    compileSdkVersion 34
+    
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 34
+        versionCode 1
+        versionName "1.0.0"
+    }
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+}
+GRADLEEOF
+    
+    echo "✅ TWA project created for $COACHING_NAME"
 else
     echo "Updating existing TWA project..."
-    bubblewrap update
 fi
 
 # Build APK

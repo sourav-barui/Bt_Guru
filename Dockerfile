@@ -47,7 +47,7 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress --no-scripts
 
 # Copy application
-# Cache bust: 2026-06-05 19:20 UTC - Added OpenJDK17 for APK builds
+# Cache bust: 2026-06-05 19:35 UTC - Added OpenJDK17 for APK builds
 COPY . .
 
 # Create production .env (overrides local .env)
