@@ -236,13 +236,32 @@
 </div>
 
 @push('scripts')
-<script src='https://{{ config('btlive.jitsi_domain', 'meet.jit.si') }}/external_api.js' onload="console.log('Jitsi loaded')" onerror="console.error('Jitsi failed to load')"></script>
 <script>
+// DEBUG: Log initial state
+console.log('=== JITSI DEBUG START ===');
+console.log('Timestamp:', new Date().toISOString());
+console.log('User Agent:', navigator.userAgent);
+console.log('Protocol:', window.location.protocol);
+console.log('Domain (config):', '{{ config('btlive.jitsi_domain', 'meet.jit.si') }}');
+
 const jitsiConfig = @json($jitsiConfig);
 const jwt = @json($jwt);
 
+console.log('jitsiConfig:', jitsiConfig);
+console.log('JWT present:', jwt ? 'YES' : 'NO');
+
+// Check if jitsi-container exists
+const containerCheck = document.getElementById('jitsi-container');
+console.log('jitsi-container exists:', containerCheck ? 'YES' : 'NO');
+
 // Initialize Jitsi
 const domain = '{{ config('btlive.jitsi_domain', 'meet.jit.si') }}';
+console.log('Domain variable:', domain);
+
+// Test network connectivity to Jitsi
+fetch(`https://${domain}/external_api.js`, { method: 'HEAD', mode: 'no-cors' })
+    .then(() => console.log('Network: Jitsi server reachable (CORS blocked but server up)'))
+    .catch(err => console.error('Network: Jitsi server unreachable:', err.message));
 const options = {
     roomName: jitsiConfig.roomName,
     parentNode: document.getElementById('jitsi-container'),
@@ -257,15 +276,119 @@ if (jwt && '{{ config('btlive.require_jwt', true) }}' === '1') {
 }
 
 let api = null;
+let scriptLoadAttempts = 0;
+const maxScriptAttempts = 3;
+
+// Dynamic script loader with retry
+function loadJitsiScript() {
+    scriptLoadAttempts++;
+    console.log(`Loading Jitsi script (attempt ${scriptLoadAttempts}/${maxScriptAttempts})...`);
+    
+    // Update loading message
+    const loadingEl = document.getElementById('jitsi-loading');
+    if (loadingEl) {
+        loadingEl.innerHTML = `
+            <div class="text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
+                <p class="text-cyan-400">Loading video conference...</p>
+                <p class="text-gray-500 text-sm mt-2">Attempt ${scriptLoadAttempts}/${maxScriptAttempts}</p>
+            </div>
+        `;
+    }
+    
+    // Remove existing script if any
+    const existingScript = document.getElementById('jitsi-external-api');
+    if (existingScript) {
+        existingScript.remove();
+    }
+    
+    // Create new script element
+    const script = document.createElement('script');
+    script.id = 'jitsi-external-api';
+    script.src = `https://${domain}/external_api.js`;
+    script.async = true;
+    
+    script.onload = function() {
+        console.log('Jitsi script loaded successfully');
+        initJitsi();
+    };
+    
+    script.onerror = function() {
+        console.error(`Jitsi script failed to load (attempt ${scriptLoadAttempts})`);
+        
+        if (scriptLoadAttempts < maxScriptAttempts) {
+            // Retry after 2 seconds
+            setTimeout(loadJitsiScript, 2000);
+        } else {
+            // All attempts failed
+            showLoadError();
+        }
+    };
+    
+    document.head.appendChild(script);
+}
+
+function showLoadError() {
+    const loadingEl = document.getElementById('jitsi-loading');
+    if (loadingEl) {
+        loadingEl.innerHTML = `
+            <div class="text-center p-6 bg-red-900/20 rounded-lg border border-red-500/30">
+                <svg class="w-12 h-12 text-red-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <p class="text-red-400 font-semibold mb-2">Failed to load video conference</p>
+                <p class="text-gray-400 text-sm mb-4">Could not connect to Jitsi server. This may be due to:</p>
+                <ul class="text-gray-400 text-sm text-left list-disc list-inside mb-4 space-y-1">
+                    <li>Network connection issues</li>
+                    <li>Firewall blocking the connection</li>
+                    <li>Jitsi server temporarily unavailable</li>
+                </ul>
+                <button onclick="location.reload()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition-colors">
+                    Refresh Page
+                </button>
+                <button onclick="loadJitsiScript()" class="ml-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors">
+                    Try Again
+                </button>
+            </div>
+        `;
+    }
+}
 
 function initJitsi() {
+    console.log('=== initJitsi called ===');
+    console.log('JitsiMeetExternalAPI defined:', typeof JitsiMeetExternalAPI !== 'undefined');
+    console.log('domain:', domain);
+    console.log('options.roomName:', options.roomName);
+    console.log('options.parentNode:', options.parentNode);
+    
     if (typeof JitsiMeetExternalAPI === 'undefined') {
-        console.error('Jitsi API not loaded yet');
-        document.getElementById('jitsi-loading').innerHTML = '<p class="text-red-400">Failed to load video conference. Please refresh.</p>';
+        console.error('Jitsi API not loaded yet - script failed to load from meet.jit.si');
+        document.getElementById('jitsi-loading').innerHTML = `
+            <div class="text-center">
+                <p class="text-red-400">Jitsi API failed to load</p>
+                <p class="text-gray-500 text-sm">Check browser console for details</p>
+                <button onclick="testManualLoad()" class="mt-2 px-3 py-1 bg-blue-600 text-white rounded text-sm">Test Manual Load</button>
+            </div>
+        `;
         return;
     }
     
-    api = new JitsiMeetExternalAPI(domain, options);
+    // Check parentNode exists
+    if (!options.parentNode) {
+        console.error('jitsi-container element not found!');
+        document.getElementById('jitsi-loading').innerHTML = '<p class="text-red-400">Container element missing</p>';
+        return;
+    }
+    
+    console.log('Creating JitsiMeetExternalAPI...');
+    try {
+        api = new JitsiMeetExternalAPI(domain, options);
+        console.log('Jitsi API created successfully');
+    } catch (e) {
+        console.error('Failed to create Jitsi API:', e);
+        document.getElementById('jitsi-loading').innerHTML = `<p class="text-red-400">Error: ${e.message}</p>`;
+        return;
+    }
     
     // Try to auto-execute join
     api.executeCommand('toggleAudio', []);
@@ -467,22 +590,6 @@ function notifyRecordingEnded(duration) {
     .catch(e => console.log('Recording webhook failed:', e));
 }
 
-api.addEventListener('recordingStatusChanged', (status) => {
-    console.log('Recording status changed:', status);
-    updateRecordingDisplay(status);
-});
-
-// Also listen for explicit start/stop events
-api.addEventListener('recordingStarted', (data) => {
-    console.log('Recording started:', data);
-    updateRecordingDisplay('on');
-});
-
-api.addEventListener('recordingStopped', (data) => {
-    console.log('Recording stopped:', data);
-    updateRecordingDisplay('off');
-});
-
 // End meeting
 function endMeeting() {
     if (!confirm('Are you sure you want to end this class for all participants?')) {
@@ -545,8 +652,40 @@ window.addEventListener('beforeunload', (e) => {
     e.returnValue = '';
 });
 
+// Manual test function for debugging
+function testManualLoad() {
+    console.log('=== MANUAL TEST ===');
+    console.log('Attempting to load Jitsi script manually...');
+    
+    const script = document.createElement('script');
+    script.src = `https://${domain}/external_api.js`;
+    script.async = true;
+    
+    script.onload = function() {
+        console.log('✓ Manual load SUCCESS!');
+        console.log('JitsiMeetExternalAPI available:', typeof JitsiMeetExternalAPI !== 'undefined');
+        alert('Jitsi script loaded successfully!');
+    };
+    
+    script.onerror = function(e) {
+        console.error('✗ Manual load FAILED:', e);
+        console.log('Error type:', e.type);
+        console.log('Target:', e.target);
+        alert('Failed to load Jitsi script. Check console for details.');
+    };
+    
+    document.head.appendChild(script);
+    console.log('Script element appended to head');
+}
+
+// Log debug info before starting
+console.log('=== DOM READY CHECK ===');
+console.log('Document readyState:', document.readyState);
+console.log('jitsi-container present:', document.getElementById('jitsi-container') ? 'YES' : 'NO');
+console.log('jitsi-loading present:', document.getElementById('jitsi-loading') ? 'YES' : 'NO');
+
 // Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', initJitsi);
+document.addEventListener('DOMContentLoaded', loadJitsiScript);
 </script>
 @endpush
 
