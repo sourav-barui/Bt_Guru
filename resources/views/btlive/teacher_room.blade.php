@@ -271,6 +271,38 @@ function initJitsi() {
     api.executeCommand('toggleAudio', []);
     api.executeCommand('toggleVideo', []);
 
+    // Auto-join the conference when ready
+    api.addEventListener('videoConferenceJoined', () => {
+        hideLoading();
+        // Lock to landscape on mobile
+        if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('landscape').catch(e => console.log('Orientation:', e));
+        }
+    });
+
+    // Run branding hide after load
+    setTimeout(hideJitsiBranding, 3000);
+    setTimeout(hideJitsiBranding, 6000);
+
+    api.addEventListener('videoConferenceJoined', hideLoading);
+    api.addEventListener('ready', hideLoading);
+    api.addEventListener('prejoinScreenLoaded', hideLoading);
+
+    // Also hide after 5 seconds as fallback
+    setTimeout(hideLoading, 5000);
+
+    // Track participant joins
+    api.addEventListener('participantJoined', (participant) => {
+        updateAttendance();
+    });
+
+    // Track participant leaves
+    api.addEventListener('participantLeft', (participant) => {
+        updateAttendance();
+    });
+
+} // Close initJitsi function
+
 // Hide loading when ready
 function hideLoading() {
     const loading = document.getElementById('jitsi-loading');
@@ -327,45 +359,6 @@ setTimeout(() => {
 }, 1000);
 
 // Auto-join the conference when ready
-api.addEventListener('videoConferenceJoined', () => {
-    hideLoading();
-    // Lock to landscape on mobile
-    if (screen.orientation && screen.orientation.lock) {
-        screen.orientation.lock('landscape').catch(e => console.log('Orientation:', e));
-    }
-});
-
-// Run branding hide after load
-setTimeout(hideJitsiBranding, 3000);
-setTimeout(hideJitsiBranding, 6000);
-
-api.addEventListener('videoConferenceJoined', hideLoading);
-api.addEventListener('ready', hideLoading);
-api.addEventListener('prejoinScreenLoaded', hideLoading);
-
-// Also hide after 5 seconds as fallback
-setTimeout(hideLoading, 5000);
-
-// Track participant joins
-api.addEventListener('participantJoined', (participant) => {
-    updateAttendance();
-});
-
-// Track participant leaves
-api.addEventListener('participantLeft', (participant) => {
-    updateAttendance();
-});
-
-// Screen sharing - auto toggle video
-api.addEventListener('screenSharingStatusChanged', (status) => {
-    if (status.on) {
-        // Screen sharing started - turn off video
-        api.executeCommand('toggleVideo', false);
-    } else {
-        // Screen sharing stopped - turn on video
-        api.executeCommand('toggleVideo', true);
-    }
-});
 
 // Recording status with live updates
 let recordingStartTime = null;
@@ -551,8 +544,6 @@ window.addEventListener('beforeunload', (e) => {
     e.preventDefault();
     e.returnValue = '';
 });
-
-} // Close initJitsi function
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', initJitsi);
