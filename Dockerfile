@@ -1,4 +1,5 @@
 # Bt_Guru Dokploy Dockerfile
+# Cache bust: 2025-06-06-2107
 FROM php:8.4-fpm-alpine
 
 # Install system dependencies
