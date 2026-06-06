@@ -322,7 +322,7 @@ if (!$isAdminSubdomain && !$isCentralDomain) {
         });
 
         // BTLive Routes
-        Route::prefix('btlive')->name('btlive.')->group(function () {
+        Route::prefix('btlive')->name('tenant.btlive.')->group(function () {
             Route::get('/create/{course}', [BTLiveController::class, 'create'])->name('create');
             Route::post('/store/{course}', [BTLiveController::class, 'store'])->name('store');
             Route::get('/{liveClass}/room', [BTLiveController::class, 'teacherRoom'])->name('teacher_room');
@@ -550,6 +550,11 @@ if (!$isAdminSubdomain && !$isCentralDomain) {
             Route::post('/notes', [CurriculumController::class, 'storeNote'])->name('storeNote');
             Route::delete('/notes/{note}', [CurriculumController::class, 'destroyNote'])->name('destroyNote');
         });
+        
+        // APK Build Management
+        Route::get('/mobile-app', [ApkBuildController::class, 'index'])->name('tenant.apk.index');
+        Route::post('/mobile-app/build', [ApkBuildController::class, 'build'])->name('tenant.apk.build');
+        Route::get('/mobile-app/status', [ApkBuildController::class, 'status'])->name('tenant.apk.status');
     });
 
     /*

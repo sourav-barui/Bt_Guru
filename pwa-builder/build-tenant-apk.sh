@@ -111,7 +111,29 @@ fi
 
 # Build APK
 echo "Building APK for $COACHING_NAME..."
-bubblewrap build
+# Use non-interactive mode - create local.properties first
+if [ -f "$JAVA_HOME/bin/java" ]; then
+    JDK_PATH="$JAVA_HOME"
+else
+    JDK_PATH="/usr/lib/jvm/java-17-openjdk"
+fi
+
+# Create local.properties for gradle to find SDK
+mkdir -p app
+cat > local.properties << EOF
+sdk.dir=$ANDROID_HOME
+EOF
+
+# Run gradle directly instead of bubblewrap interactive
+if [ -f "./gradlew" ]; then
+    ./gradlew assembleRelease --no-daemon -q
+elif [ -f "app/gradlew" ]; then
+    cd app && ./gradlew assembleRelease --no-daemon -q
+else
+    # Fallback to bubblewrap with expect
+    echo -e "n\n$JDK_PATH\n" | timeout 60 bubblewrap build --skipSigning 2>/dev/null || \
+        echo "Build requires manual gradle setup"
+fi
 
 # Rename output files with tenant slug
 APK_SOURCE="app/build/outputs/apk/release/app-release.apk"
