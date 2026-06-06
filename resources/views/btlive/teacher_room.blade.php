@@ -236,7 +236,7 @@
 </div>
 
 @push('scripts')
-<script src='https://{{ config('btlive.jitsi_domain', 'meet.jit.si') }}/external_api.js'></script>
+<script src='https://{{ config('btlive.jitsi_domain', 'meet.jit.si') }}/external_api.js' onload="console.log('Jitsi loaded')" onerror="console.error('Jitsi failed to load')"></script>
 <script>
 const jitsiConfig = @json($jitsiConfig);
 const jwt = @json($jwt);
