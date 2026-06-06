@@ -430,7 +430,7 @@ function notifyRecordingEnded(duration) {
     // Show processing state
     document.getElementById('recording-processing').classList.remove('hidden');
     
-    fetch('{{ route("btlive.recording_webhook", $liveClass) }}', {
+    fetch('{{ route("tenant.btlive.recording_webhook", $liveClass) }}', {
         method: 'POST',
         headers: {
             'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -493,7 +493,7 @@ function endMeeting() {
     }
     
     // First save recording info, then end meeting
-    fetch('{{ route("btlive.end_meeting", $liveClass) }}', {
+    fetch('{{ route("tenant.btlive.end_meeting", $liveClass) }}', {
         method: 'POST',
         headers: {
             'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -526,7 +526,7 @@ function toggleLobby() {
 
 // Update attendance stats
 function updateAttendance() {
-    fetch('{{ route("btlive.live_stats", $liveClass) }}')
+    fetch('{{ route("tenant.btlive.live_stats", $liveClass) }}')
         .then(r => r.json())
         .then(data => {
             document.getElementById('attendance-count').textContent = data.stats.total_present;
