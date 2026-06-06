@@ -256,7 +256,20 @@ if (jwt && '{{ config('btlive.require_jwt', true) }}' === '1') {
     options.jwt = jwt;
 }
 
-const api = new JitsiMeetExternalAPI(domain, options);
+let api = null;
+
+function initJitsi() {
+    if (typeof JitsiMeetExternalAPI === 'undefined') {
+        console.error('Jitsi API not loaded yet');
+        document.getElementById('jitsi-loading').innerHTML = '<p class="text-red-400">Failed to load video conference. Please refresh.</p>';
+        return;
+    }
+    
+    api = new JitsiMeetExternalAPI(domain, options);
+    
+    // Try to auto-execute join
+    api.executeCommand('toggleAudio', []);
+    api.executeCommand('toggleVideo', []);
 
 // Hide loading when ready
 function hideLoading() {
@@ -321,10 +334,6 @@ api.addEventListener('videoConferenceJoined', () => {
         screen.orientation.lock('landscape').catch(e => console.log('Orientation:', e));
     }
 });
-
-// Try to auto-execute join
-api.executeCommand('toggleAudio', []);
-api.executeCommand('toggleVideo', []);
 
 // Run branding hide after load
 setTimeout(hideJitsiBranding, 3000);
@@ -542,6 +551,11 @@ window.addEventListener('beforeunload', (e) => {
     e.preventDefault();
     e.returnValue = '';
 });
+
+} // Close initJitsi function
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', initJitsi);
 </script>
 @endpush
 
