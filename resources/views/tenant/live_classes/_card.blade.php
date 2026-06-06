@@ -59,7 +59,7 @@
     <div class="flex items-center gap-2 flex-shrink-0">
         {{-- BTLive Room Button --}}
         @if($lc->is_btlive)
-            <a href="{{ route('btlive.teacher_room', $lc) }}" target="_blank"
+            <a href="{{ route('tenant.btlive.teacher_room', $lc) }}" target="_blank"
                class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
@@ -68,7 +68,7 @@
             </a>
         @else
             {{-- Convert to BTLive Button --}}
-            <form method="POST" action="{{ route('btlive.convert', $lc) }}" 
+            <form method="POST" action="{{ route('tenant.btlive.convert', $lc) }}" 
                   onsubmit="return confirm('Convert this class to BTLive? Students will join via BTLive instead of external meeting link.')">
                 @csrf
                 <button type="submit" 

@@ -131,7 +131,7 @@
                                         <button onclick="toggleContentForm('subject-live-{{ $subject->id }}')" class="p-1.5 hover:bg-red-50 rounded" title="Schedule Live Class" style="color:#ef4444">
                                             <svg class="w-4 h-4" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.07A1 1 0 0121 8.845v6.31a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                         </button>
-                                        <a href="{{ route('btlive.create', $course) }}?subject_id={{ $subject->id }}" class="p-1.5 hover:bg-red-50 rounded" title="New BTLive" style="color:#dc2626">
+                                        <a href="{{ route('tenant.btlive.create', $course) }}?subject_id={{ $subject->id }}" class="p-1.5 hover:bg-red-50 rounded" title="New BTLive" style="color:#dc2626">
                                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                         </a>
                                         <button onclick="toggleContentForm('subject-video-{{ $subject->id }}')" class="p-1.5 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded" title="Add Video">
@@ -202,7 +202,7 @@
                                                     <button onclick="toggleContentForm('chapter-live-{{ $chapter->id }}')" class="p-1 hover:bg-red-50 rounded" title="Schedule Live Class" style="color:#ef4444">
                                                         <svg class="w-4 h-4" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.07A1 1 0 0121 8.845v6.31a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                                     </button>
-                                                    <a href="{{ route('btlive.create', $course) }}?chapter_id={{ $chapter->id }}" class="p-1 hover:bg-red-50 rounded" title="New BTLive" style="color:#dc2626">
+                                                    <a href="{{ route('tenant.btlive.create', $course) }}?chapter_id={{ $chapter->id }}" class="p-1 hover:bg-red-50 rounded" title="New BTLive" style="color:#dc2626">
                                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                                     </a>
                                                     <button onclick="toggleContentForm('video-{{ $chapter->id }}')" class="p-1 text-blue-400 hover:text-blue-600" title="Add Video">
@@ -271,7 +271,7 @@
                                                             <button onclick="toggleContentForm('lesson-live-{{ $lesson->id }}')" class="p-1 hover:bg-red-50 rounded" title="Schedule Live Class" style="color:#ef4444">
                                                                 <svg class="w-4 h-4" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.07A1 1 0 0121 8.845v6.31a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                                             </button>
-                                                            <a href="{{ route('btlive.create', $course) }}?lesson_id={{ $lesson->id }}" class="p-1 hover:bg-red-50 rounded" title="New BTLive" style="color:#dc2626">
+                                                            <a href="{{ route('tenant.btlive.create', $course) }}?lesson_id={{ $lesson->id }}" class="p-1 hover:bg-red-50 rounded" title="New BTLive" style="color:#dc2626">
                                                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                                             </a>
                                                             <button onclick="toggleContentForm('lesson-video-{{ $lesson->id }}')" class="p-1 text-blue-400 hover:text-blue-600" title="Add Video">

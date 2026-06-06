@@ -43,7 +43,7 @@
     </div>
 
     {{-- Form --}}
-    <form action="{{ route('btlive.store', $course) }}" method="POST" class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-6">
+    <form action="{{ route('tenant.btlive.store', $course) }}" method="POST" class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-6">
         @csrf
         
         {{-- Hidden fields for curriculum level --}}
