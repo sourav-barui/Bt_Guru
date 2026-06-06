@@ -157,9 +157,6 @@ class BTLiveController extends Controller
      */
     public function studentRoom(LiveClass $liveClass)
     {
-        // Debug test - checking if code is reached
-        return response('DEBUG REACHED: Class ID=' . $liveClass->id . ', User=' . (Auth::check() ? Auth::user()->name : 'NOT LOGGED IN'), 200);
-        
         try {
             $student = Auth::user();
             if (!$student) {
