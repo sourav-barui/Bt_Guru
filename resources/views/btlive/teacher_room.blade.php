@@ -307,6 +307,7 @@ function loadJitsiScript() {
     script.id = 'jitsi-external-api';
     script.src = `https://${domain}/external_api.js`;
     script.async = true;
+    script.crossOrigin = 'anonymous';
     
     script.onload = function() {
         console.log('Jitsi script loaded successfully');
