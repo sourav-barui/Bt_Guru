@@ -16,7 +16,7 @@ class BTLiveSettingsController extends Controller
     {
         $settings = [
             // Jitsi Configuration
-            'jitsi_domain' => config('btlive.jitsi_domain'),
+            'jitsi_domain' => env('BTLIVE_JITSI_DOMAIN', 'meet.btguru.tech'),
             'jitsi_app_id' => config('btlive.jitsi_app_id'),
             'jitsi_app_secret' => config('btlive.jitsi_app_secret') ? '********' : null,
             

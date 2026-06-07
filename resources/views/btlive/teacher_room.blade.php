@@ -242,7 +242,7 @@ console.log('=== JITSI DEBUG START ===');
 console.log('Timestamp:', new Date().toISOString());
 console.log('User Agent:', navigator.userAgent);
 console.log('Protocol:', window.location.protocol);
-console.log('Domain (config):', '{{ config('btlive.jitsi_domain', 'meet.jit.si') }}');
+console.log('Domain (config):', '{{ env('BTLIVE_JITSI_DOMAIN', 'meet.btguru.tech') }}');
 
 const jitsiConfig = @json($jitsiConfig);
 const jwt = @json($jwt);
@@ -255,7 +255,7 @@ const containerCheck = document.getElementById('jitsi-container');
 console.log('jitsi-container exists:', containerCheck ? 'YES' : 'NO');
 
 // Initialize Jitsi
-const domain = '{{ config('btlive.jitsi_domain', 'meet.jit.si') }}';
+const domain = '{{ env('BTLIVE_JITSI_DOMAIN', 'meet.btguru.tech') }}';
 console.log('Domain variable:', domain);
 
 // Test network connectivity to Jitsi

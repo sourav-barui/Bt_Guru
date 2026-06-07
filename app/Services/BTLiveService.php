@@ -26,9 +26,9 @@ class BTLiveService
     
     public function __construct()
     {
-        $this->jitsiDomain = config('btlive.jitsi_domain', 'meet.jit.si');
-        $this->appId = config('btlive.jitsi_app_id');
-        $this->appSecret = config('btlive.jitsi_app_secret');
+        $this->jitsiDomain = env('BTLIVE_JITSI_DOMAIN', 'meet.btguru.tech');
+        $this->appId = env('BTLIVE_JITSI_APP_ID');
+        $this->appSecret = env('BTLIVE_JITSI_APP_SECRET');
     }
     
     /**

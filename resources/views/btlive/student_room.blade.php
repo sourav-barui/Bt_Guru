@@ -44,7 +44,7 @@
 @endsection
 
 @push('scripts')
-<script src='https://meet.jit.si/external_api.js' onload="initJitsi()" onerror="handleJitsiLoadError()"></script>
+<script src='https://{{ env('BTLIVE_JITSI_DOMAIN', 'meet.btguru.tech') }}/external_api.js' onload="initJitsi()" onerror="handleJitsiLoadError()"></script>
 <script>
     const jitsiConfig = @json($jitsiConfig);
     const jwt = '{{ $jwt }}';

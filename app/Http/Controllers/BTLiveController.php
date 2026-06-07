@@ -96,7 +96,7 @@ class BTLiveController extends Controller
         // Update with room name and meeting URL
         $liveClass->update([
             'btlive_room_name' => $roomName,
-            'meeting_url' => 'https://' . config('btlive.jitsi_domain', 'meet.jit.si') . '/' . $roomName,
+            'meeting_url' => 'https://' . env('BTLIVE_JITSI_DOMAIN', 'meet.btguru.tech') . '/' . $roomName,
         ]);
         
         // Notify enrolled students
