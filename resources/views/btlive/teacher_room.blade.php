@@ -434,14 +434,9 @@ function hideLoading() {
 
 // Hide Jitsi branding elements
 function hideJitsiBranding() {
-    // Try to access iframe and hide branding
-    const iframe = document.getElementById('jitsiConferenceFrame0');
-    if (iframe && iframe.contentWindow && iframe.contentWindow.document) {
-        const jitsiDoc = iframe.contentWindow.document;
-        // Hide watermarks
-        const watermarks = jitsiDoc.querySelectorAll('.watermark, .leftwatermark, .rightwatermark');
-        watermarks.forEach(el => el.style.display = 'none');
-    }
+    // Cannot access cross-origin iframe content - this would throw SecurityError
+    // Jitsi branding must be hidden via Jitsi config options, not DOM access
+    console.log('Note: Cannot hide Jitsi branding from cross-origin iframe');
 }
 
 // Toggle Full Screen Mode
