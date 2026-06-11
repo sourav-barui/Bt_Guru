@@ -25,9 +25,9 @@ class Authenticate extends Middleware
             return route('tenant.login');
         }
 
-        // If main domain, redirect to tenant login or return null
-        if ($host === $centralDomain) {
-            return '/login';
+        // If main domain or localhost, redirect to tenant login
+        if ($host === $centralDomain || $host === 'localhost' || $host === '127.0.0.1') {
+            return route('tenant.login');
         }
 
         return route('admin.login');

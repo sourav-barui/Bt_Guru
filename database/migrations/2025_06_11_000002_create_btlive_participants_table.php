@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('session_id')->constrained('btlive_sessions')->onDelete('cascade');
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignId('student_id')->nullable()->constrained()->onDelete('set null');
+            $table->unsignedBigInteger('student_id')->nullable(); // Foreign key added later when students table exists
             
             $table->enum('role', ['teacher', 'student', 'moderator', 'guest'])->default('student');
             $table->string('name');
@@ -35,7 +35,7 @@ return new class extends Migration
             
             $table->index(['session_id', 'is_active']);
             $table->index(['user_id']);
-            $table->index(['student_id']);
+            $table->index('student_id');
         });
     }
 

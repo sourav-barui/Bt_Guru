@@ -60,6 +60,14 @@ $host = Request::getHost();
 $centralDomain = config('app.central_domain');
 $adminSubdomain = config('app.admin_subdomain');
 
+// DEBUG: Log host detection
+\Log::debug('Route Host Detection', [
+    'host' => $host,
+    'centralDomain' => $centralDomain,
+    'adminSubdomain' => $adminSubdomain,
+    'isLocalhost' => $host === 'localhost' || $host === '127.0.0.1'
+]);
+
 // Check if this is admin subdomain
 $isAdminSubdomain = str_starts_with($host, $adminSubdomain . '.');
 
@@ -72,11 +80,16 @@ $isCentralDomain = $host === $centralDomain;
 |--------------------------------------------------------------------------
 */
 
-if ($isCentralDomain) {
+if ($isCentralDomain || $host === 'localhost' || $host === '127.0.0.1') {
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/about', [HomeController::class, 'about'])->name('about');
     Route::get('/pricing', [HomeController::class, 'pricing'])->name('pricing');
     Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
+    
+    // Login route for localhost/central domain
+    Route::get('/login', function () {
+        return redirect()->route('tenant.login');
+    })->name('login');
 
     // Tenant Registration Wizard
     Route::get('/register', [RegisterController::class, 'showTenantRegistration'])->name('tenant.register');
@@ -192,11 +205,34 @@ if ($isAdminSubdomain) {
 |--------------------------------------------------------------------------
 */
 
-if (!$isAdminSubdomain && !$isCentralDomain) {
+// DEBUG: Check condition
+$condition = !$isAdminSubdomain && !$isCentralDomain || $host === 'localhost' || $host === '127.0.0.1';
+\Log::debug('Tenant Routes Condition', [
+    'condition' => $condition,
+    'isAdminSubdomain' => $isAdminSubdomain,
+    'isCentralDomain' => $isCentralDomain,
+    'host' => $host
+]);
+
+if ($condition) {
+    \Log::debug('Loading tenant routes for: ' . $host);
+    
+    // Set default tenant for localhost testing
+    if (($host === 'localhost' || $host === '127.0.0.1') && !session('current_tenant_id')) {
+        $firstTenant = \App\Models\Tenant::first();
+        \Log::debug('Setting default tenant', ['tenant_id' => $firstTenant?->id]);
+        if ($firstTenant) {
+            session(['current_tenant_id' => $firstTenant->id]);
+        }
+    }
     
     // Public Tenant Routes
     Route::get('/', function () {
         $tenant = app('current_tenant');
+        \Log::debug('Root route accessed', ['tenant' => $tenant?->id]);
+        if (!$tenant) {
+            return redirect('/login');
+        }
         return view('tenant.landing', compact('tenant'));
     })->name('tenant.home');
 
