@@ -131,9 +131,12 @@
                                         <button onclick="toggleContentForm('subject-live-{{ $subject->id }}')" class="p-1.5 hover:bg-red-50 rounded" title="Schedule Live Class" style="color:#ef4444">
                                             <svg class="w-4 h-4" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.07A1 1 0 0121 8.845v6.31a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                         </button>
-                                        <a href="{{ route('tenant.btlive.create', $course) }}?subject_id={{ $subject->id }}" class="p-1.5 hover:bg-red-50 rounded" title="New BTLive" style="color:#dc2626">
+                                        <a href="{{ route('tenant.btlive.create', $course) }}?subject_id={{ $subject->id }}" class="p-1.5 hover:bg-red-50 rounded" title="New BTLive (Old)" style="color:#dc2626">
                                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                         </a>
+                                        <button onclick="toggleContentForm('btlive-v2-subject-{{ $subject->id }}')" class="p-1.5 hover:bg-indigo-50 rounded" title="New BTLIVE V2" style="color:#4f46e5">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                        </button>
                                         <button onclick="toggleContentForm('subject-video-{{ $subject->id }}')" class="p-1.5 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded" title="Add Video">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
@@ -202,9 +205,12 @@
                                                     <button onclick="toggleContentForm('chapter-live-{{ $chapter->id }}')" class="p-1 hover:bg-red-50 rounded" title="Schedule Live Class" style="color:#ef4444">
                                                         <svg class="w-4 h-4" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.07A1 1 0 0121 8.845v6.31a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                                     </button>
-                                                    <a href="{{ route('tenant.btlive.create', $course) }}?chapter_id={{ $chapter->id }}" class="p-1 hover:bg-red-50 rounded" title="New BTLive" style="color:#dc2626">
+                                                    <a href="{{ route('tenant.btlive.create', $course) }}?chapter_id={{ $chapter->id }}" class="p-1 hover:bg-red-50 rounded" title="New BTLive (Old)" style="color:#dc2626">
                                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                                     </a>
+                                                    <button onclick="toggleContentForm('btlive-v2-chapter-{{ $chapter->id }}')" class="p-1 hover:bg-indigo-50 rounded" title="New BTLIVE V2" style="color:#4f46e5">
+                                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                                    </button>
                                                     <button onclick="toggleContentForm('video-{{ $chapter->id }}')" class="p-1 text-blue-400 hover:text-blue-600" title="Add Video">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
@@ -271,9 +277,12 @@
                                                             <button onclick="toggleContentForm('lesson-live-{{ $lesson->id }}')" class="p-1 hover:bg-red-50 rounded" title="Schedule Live Class" style="color:#ef4444">
                                                                 <svg class="w-4 h-4" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.07A1 1 0 0121 8.845v6.31a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                                             </button>
-                                                            <a href="{{ route('tenant.btlive.create', $course) }}?lesson_id={{ $lesson->id }}" class="p-1 hover:bg-red-50 rounded" title="New BTLive" style="color:#dc2626">
+                                                            <a href="{{ route('tenant.btlive.create', $course) }}?lesson_id={{ $lesson->id }}" class="p-1 hover:bg-red-50 rounded" title="New BTLive (Old)" style="color:#dc2626">
                                                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                                             </a>
+                                                            <button onclick="toggleContentForm('btlive-v2-lesson-{{ $lesson->id }}')" class="p-1 hover:bg-indigo-50 rounded" title="New BTLIVE V2" style="color:#4f46e5">
+                                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                                            </button>
                                                             <button onclick="toggleContentForm('lesson-video-{{ $lesson->id }}')" class="p-1 text-blue-400 hover:text-blue-600" title="Add Video">
                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
@@ -306,7 +315,40 @@
                                                         </div>
                                                     </div>
 
-                                                    {{-- Lesson Live Classes --}}
+                                                    {{-- Lesson BTLIVE V2 Sessions --}}
+                                                    @foreach($lesson->btliveSessions as $session)
+                                                        <div class="ml-4 flex items-center justify-between py-1.5 px-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                                                            <div class="flex items-center gap-2">
+                                                                <svg class="w-3 h-3 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.07A1 1 0 0121 8.845v6.31a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                                                <div>
+                                                                    <span class="text-sm text-gray-800">{{ $session->title }}</span>
+                                                                    <span class="text-xs bg-indigo-600 text-white px-1.5 py-0.5 rounded ml-1">V2</span>
+                                                                    <div class="text-xs text-gray-500">{{ $session->scheduled_at->format('d M Y, h:i A') }} · {{ $session->duration_minutes }}min · Max {{ $session->max_participants }} students</div>
+                                                                </div>
+                                                                <span class="text-xs font-bold px-1.5 py-0.5 rounded-full {{ $session->status === 'live' ? 'bg-red-500 text-white animate-pulse' : ($session->status === 'scheduled' ? 'bg-yellow-500 text-white' : 'bg-gray-500 text-white') }}">{{ ucfirst($session->status) }}</span>
+                                                            </div>
+                                                            <div class="flex items-center gap-1">
+                                                                @if($session->status === 'scheduled')
+                                                                    <a href="{{ route('tenant.btlive-v2.teacher_room', $session) }}" class="px-2 py-1 bg-indigo-600 text-white text-xs font-bold rounded hover:bg-indigo-700 flex items-center gap-1">
+                                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                                        START V2
+                                                                    </a>
+                                                                @elseif($session->status === 'live')
+                                                                    <a href="{{ route('tenant.btlive-v2.teacher_room', $session) }}" class="px-2 py-1 bg-red-600 text-white text-xs font-bold rounded hover:bg-red-700 flex items-center gap-1 animate-pulse">
+                                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                                        JOIN LIVE
+                                                                    </a>
+                                                                @else
+                                                                    <a href="{{ route('tenant.btlive-v2.teacher_room', $session) }}" class="px-2 py-1 bg-gray-600 text-white text-xs font-bold rounded hover:bg-gray-700 flex items-center gap-1">
+                                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                                        VIEW
+                                                                    </a>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+
+                                                    {{-- Lesson Live Classes (Old) --}}
                                                     @foreach($lesson->liveClasses as $lc)
                                                         <div class="ml-4 flex items-center justify-between py-1.5 px-3 bg-red-50 rounded-lg">
                                                             <div class="flex items-center gap-2">
@@ -390,7 +432,29 @@
                                                         @endif
                                                     @endforeach
 
-                                                    {{-- Lesson Add Live Class Form --}}
+                                                    {{-- Lesson Add BTLIVE V2 Form --}}
+                                                    <div id="btlive-v2-lesson-{{ $lesson->id }}" class="hidden ml-4 p-2 bg-indigo-50 rounded-lg border border-indigo-200">
+                                                        <form method="POST" action="{{ route('tenant.btlive-v2.store_session', $course) }}" class="space-y-2">
+                                                            @csrf
+                                                            <input type="hidden" name="lesson_id" value="{{ $lesson->id }}">
+                                                            <input type="hidden" name="chapter_id" value="{{ $chapter->id }}">
+                                                            <input type="hidden" name="subject_id" value="{{ $subject->id }}">
+                                                            <div class="flex items-center gap-2 mb-1">
+                                                                <span class="text-xs font-bold bg-indigo-600 text-white px-2 py-0.5 rounded">BTLIVE V2</span>
+                                                            </div>
+                                                            <input type="text" name="title" placeholder="Session title" class="form-input text-sm w-full" required>
+                                                            <div class="grid grid-cols-2 gap-2">
+                                                                <input type="datetime-local" name="scheduled_at" class="form-input text-sm" required>
+                                                                <input type="number" name="duration_minutes" value="60" placeholder="Duration" class="form-input text-sm" min="15" max="300" required>
+                                                            </div>
+                                                            <div class="flex gap-2">
+                                                                <button type="submit" class="bg-indigo-600 text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-indigo-700">Create V2</button>
+                                                                <button type="button" onclick="toggleContentForm('btlive-v2-lesson-{{ $lesson->id }}')" class="btn-secondary text-xs py-1.5">Cancel</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+
+                                                    {{-- Lesson Add Live Class Form (Old) --}}
                                                     <div id="lesson-live-{{ $lesson->id }}" class="hidden ml-4 p-2 bg-red-50 rounded-lg">
                                                         <form method="POST" action="{{ route('tenant.live_classes.store', $course) }}" class="space-y-2">
                                                             @csrf
@@ -556,7 +620,40 @@
 
                                             <!-- Videos & Notes -->
                                             <div class="ml-4 space-y-2">
-                                                {{-- Chapter Live Classes --}}
+                                                {{-- Chapter BTLIVE V2 Sessions --}}
+                                                @foreach($chapter->btliveSessions->where('lesson_id', null) as $session)
+                                                    <div class="flex items-center justify-between py-2 px-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                                                        <div class="flex items-center gap-2">
+                                                            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.07A1 1 0 0121 8.845v6.31a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                                            <div>
+                                                                <span class="text-sm font-medium text-gray-800">{{ $session->title }}</span>
+                                                                <span class="text-xs bg-indigo-600 text-white px-1.5 py-0.5 rounded ml-1">V2</span>
+                                                                <div class="text-xs text-gray-500">{{ $session->scheduled_at->format('d M Y, h:i A') }} · {{ $session->duration_minutes }}min · Max {{ $session->max_participants }} students</div>
+                                                            </div>
+                                                            <span class="text-xs font-bold px-2 py-0.5 rounded-full {{ $session->status === 'live' ? 'bg-red-500 text-white animate-pulse' : ($session->status === 'scheduled' ? 'bg-yellow-500 text-white' : 'bg-gray-500 text-white') }}">{{ ucfirst($session->status) }}</span>
+                                                        </div>
+                                                        <div class="flex items-center gap-1">
+                                                            @if($session->status === 'scheduled')
+                                                                <a href="{{ route('tenant.btlive-v2.teacher_room', $session) }}" class="px-2 py-1 bg-indigo-600 text-white text-xs font-bold rounded hover:bg-indigo-700 flex items-center gap-1">
+                                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                                    START V2
+                                                                </a>
+                                                            @elseif($session->status === 'live')
+                                                                <a href="{{ route('tenant.btlive-v2.teacher_room', $session) }}" class="px-2 py-1 bg-red-600 text-white text-xs font-bold rounded hover:bg-red-700 flex items-center gap-1 animate-pulse">
+                                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                                    JOIN LIVE
+                                                                </a>
+                                                            @else
+                                                                <a href="{{ route('tenant.btlive-v2.teacher_room', $session) }}" class="px-2 py-1 bg-gray-600 text-white text-xs font-bold rounded hover:bg-gray-700 flex items-center gap-1">
+                                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                                    VIEW
+                                                                </a>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+
+                                                {{-- Chapter Live Classes (Old) --}}
                                                 @foreach($chapter->liveClasses->where('lesson_id', null) as $lc)
                                                     <div class="flex items-center justify-between py-2 px-3 bg-red-50 rounded-lg">
                                                         <div class="flex items-center gap-2">
@@ -640,7 +737,28 @@
                                                     @endif
                                                 @endforeach
 
-                                                {{-- Chapter Add Live Class Form --}}
+                                                {{-- Chapter Add BTLIVE V2 Form --}}
+                                                <div id="btlive-v2-chapter-{{ $chapter->id }}" class="hidden mt-2 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                                                    <form method="POST" action="{{ route('tenant.btlive-v2.store_session', $course) }}" class="space-y-2">
+                                                        @csrf
+                                                        <input type="hidden" name="chapter_id" value="{{ $chapter->id }}">
+                                                        <input type="hidden" name="subject_id" value="{{ $subject->id }}">
+                                                        <div class="flex items-center gap-2 mb-1">
+                                                            <span class="text-xs font-bold bg-indigo-600 text-white px-2 py-0.5 rounded">BTLIVE V2</span>
+                                                        </div>
+                                                        <input type="text" name="title" placeholder="Session title" class="form-input text-sm w-full" required>
+                                                        <div class="grid grid-cols-2 gap-2">
+                                                            <input type="datetime-local" name="scheduled_at" class="form-input text-sm" required>
+                                                            <input type="number" name="duration_minutes" value="60" placeholder="Duration" class="form-input text-sm" min="15" max="300" required>
+                                                        </div>
+                                                        <div class="flex gap-2">
+                                                            <button type="submit" class="bg-indigo-600 text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-indigo-700">Create V2</button>
+                                                            <button type="button" onclick="toggleContentForm('btlive-v2-chapter-{{ $chapter->id }}')" class="btn-secondary text-xs py-1.5">Cancel</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+
+                                                {{-- Chapter Add Live Class Form (Old) --}}
                                                 <div id="chapter-live-{{ $chapter->id }}" class="hidden mt-2 p-3 bg-red-50 rounded-lg">
                                                     <form method="POST" action="{{ route('tenant.live_classes.store', $course) }}" class="space-y-2">
                                                         @csrf
@@ -801,9 +919,42 @@
                                 </div>
 
                                 <!-- Subject Level Content -->
-                                @if($subject->contents->count() > 0 || $subject->notes->count() > 0 || $subject->liveClasses->where('chapter_id', null)->count() > 0)
+                                @if($subject->contents->count() > 0 || $subject->notes->count() > 0 || $subject->liveClasses->where('chapter_id', null)->count() > 0 || $subject->btliveSessions->where('chapter_id', null)->count() > 0)
                                     <div class="mt-3 ml-4 space-y-2 border-t border-gray-100 pt-3">
-                                        {{-- Subject Live Classes --}}
+                                        {{-- Subject BTLIVE V2 Sessions --}}
+                                        @foreach($subject->btliveSessions->where('chapter_id', null) as $session)
+                                            <div class="flex items-center justify-between py-2 px-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                                                <div class="flex items-center gap-2">
+                                                    <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.07A1 1 0 0121 8.845v6.31a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                                    <div>
+                                                        <span class="text-sm font-medium text-gray-800">{{ $session->title }}</span>
+                                                        <span class="text-xs bg-indigo-600 text-white px-1.5 py-0.5 rounded ml-1">V2</span>
+                                                        <div class="text-xs text-gray-500">{{ $session->scheduled_at->format('d M Y, h:i A') }} · {{ $session->duration_minutes }}min · Max {{ $session->max_participants }} students</div>
+                                                    </div>
+                                                    <span class="text-xs font-bold px-2 py-0.5 rounded-full {{ $session->status === 'live' ? 'bg-red-500 text-white animate-pulse' : ($session->status === 'scheduled' ? 'bg-yellow-500 text-white' : 'bg-gray-500 text-white') }}">{{ ucfirst($session->status) }}</span>
+                                                </div>
+                                                <div class="flex items-center gap-1">
+                                                    @if($session->status === 'scheduled')
+                                                        <a href="{{ route('tenant.btlive-v2.teacher_room', $session) }}" class="px-2 py-1 bg-indigo-600 text-white text-xs font-bold rounded hover:bg-indigo-700 flex items-center gap-1">
+                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                            START V2
+                                                        </a>
+                                                    @elseif($session->status === 'live')
+                                                        <a href="{{ route('tenant.btlive-v2.teacher_room', $session) }}" class="px-2 py-1 bg-red-600 text-white text-xs font-bold rounded hover:bg-red-700 flex items-center gap-1 animate-pulse">
+                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                            JOIN LIVE
+                                                        </a>
+                                                    @else
+                                                        <a href="{{ route('tenant.btlive-v2.teacher_room', $session) }}" class="px-2 py-1 bg-gray-600 text-white text-xs font-bold rounded hover:bg-gray-700 flex items-center gap-1">
+                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                            VIEW
+                                                        </a>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endforeach
+
+                                        {{-- Subject Live Classes (Old) --}}
                                         @foreach($subject->liveClasses->where('chapter_id', null) as $lc)
                                             <div class="flex items-center justify-between py-2 px-3 bg-red-50 rounded-lg">
                                                 <div class="flex items-center gap-2">
@@ -966,7 +1117,7 @@
                                     </div>
                                 @endif
 
-                                <!-- Subject Add Live Class Form -->
+                                <!-- Subject Add Live Class Form (Old) -->
                                 <div id="subject-live-{{ $subject->id }}" class="hidden ml-4 mt-2 p-3 bg-red-50 rounded-lg">
                                     <form method="POST" action="{{ route('tenant.live_classes.store', $course) }}" class="space-y-2">
                                         @csrf
@@ -997,6 +1148,47 @@
                                         <div class="flex gap-2">
                                             <button type="submit" class="btn-primary text-sm py-1.5">Schedule</button>
                                             <button type="button" onclick="toggleContentForm('subject-live-{{ $subject->id }}')" class="btn-secondary text-sm py-1.5">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- Subject Add BTLIVE V2 Form -->
+                                <div id="btlive-v2-subject-{{ $subject->id }}" class="hidden ml-4 mt-2 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                                    <form method="POST" action="{{ route('tenant.btlive-v2.store_session', $course) }}" class="space-y-2">
+                                        @csrf
+                                        <input type="hidden" name="subject_id" value="{{ $subject->id }}">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="text-xs font-bold bg-indigo-600 text-white px-2 py-0.5 rounded">BTLIVE V2</span>
+                                            <span class="text-xs text-indigo-700">Digital Classroom</span>
+                                        </div>
+                                        <input type="text" name="title" placeholder="Session title" class="form-input text-sm" required>
+                                        <textarea name="description" placeholder="Description (optional)" class="form-input text-sm" rows="2"></textarea>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <input type="datetime-local" name="scheduled_at" class="form-input text-sm" required>
+                                            <input type="number" name="duration_minutes" value="60" placeholder="Duration (min)" class="form-input text-sm" min="15" max="300" required>
+                                        </div>
+                                        <input type="text" name="access_code" placeholder="Access code (optional)" class="form-input text-sm">
+                                        <div class="grid grid-cols-2 gap-2 text-xs">
+                                            <label class="flex items-center gap-1 cursor-pointer">
+                                                <input type="checkbox" name="chat_enabled" value="1" checked class="rounded">
+                                                <span>Chat</span>
+                                            </label>
+                                            <label class="flex items-center gap-1 cursor-pointer">
+                                                <input type="checkbox" name="raise_hand_enabled" value="1" checked class="rounded">
+                                                <span>Raise Hand</span>
+                                            </label>
+                                            <label class="flex items-center gap-1 cursor-pointer">
+                                                <input type="checkbox" name="polls_enabled" value="1" checked class="rounded">
+                                                <span>Polls</span>
+                                            </label>
+                                            <label class="flex items-center gap-1 cursor-pointer">
+                                                <input type="checkbox" name="recording_enabled" value="1" checked class="rounded">
+                                                <span>Recording</span>
+                                            </label>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button type="submit" class="bg-indigo-600 text-white px-3 py-1.5 rounded text-sm font-medium hover:bg-indigo-700">Create V2 Session</button>
+                                            <button type="button" onclick="toggleContentForm('btlive-v2-subject-{{ $subject->id }}')" class="btn-secondary text-sm py-1.5">Cancel</button>
                                         </div>
                                     </form>
                                 </div>

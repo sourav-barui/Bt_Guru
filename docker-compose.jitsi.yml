@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  jitsi-web:
+    image: jitsi/web:stable
+    ports:
+      - '8443:443'
+    environment:
+      - JITSI_HOST=live.ecchapuron.btguru.tech
+      - JITSI_SECRET=your-secret-key
+      - ENABLE_LETSENCRYPT=1
+      - LETSENCRYPT_DOMAIN=live.ecchapuron.btguru.tech
+      - LETSENCRYPT_EMAIL=admin@btguru.tech
+    volumes:
+      - jitsi-web-config:/config
+      - jitsi-web-letsencrypt:/etc/letsencrypt
+    networks:
+      - jitsi
+
+  jitsi-prosody:
+    image: jitsi/prosody:stable
+    environment:
+      - JITSI_HOST=live.ecchapuron.btguru.tech
+      - JITSI_SECRET=your-secret-key
+    volumes:
+      - jitsi-prosody-config:/config
+    networks:
+      - jitsi
+
+  jitsi-jicofo:
+    image: jitsi/jicofo:stable
+    environment:
+      - JITSI_HOST=live.ecchapuron.btguru.tech
+      - JITSI_SECRET=your-secret-key
+    networks:
+      - jitsi
+    depends_on:
+      - jitsi-prosody
+
+  jitsi-jvb:
+    image: jitsi/jvb:stable
+    ports:
+      - '10000:10000/udp'
+    environment:
+      - JITSI_HOST=live.ecchapuron.btguru.tech
+      - JITSI_SECRET=your-secret-key
+      - JVB_ADVERTISE_IPS=your-server-ip
+    networks:
+      - jitsi
+    depends_on:
+      - jitsi-prosody
+
+volumes:
+  jitsi-web-config:
+  jitsi-web-letsencrypt:
+  jitsi-prosody-config:
+
+networks:
+  jitsi:
+    driver: bridge

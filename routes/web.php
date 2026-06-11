@@ -48,6 +48,7 @@ use App\Http\Controllers\Student\BookController as StudentBookController;
 // BTLive Controllers
 use App\Http\Controllers\BTLiveController;
 use App\Http\Controllers\BTLiveRecordingController;
+use App\Http\Controllers\BTLiveV2Controller;
 
 /*
 |--------------------------------------------------------------------------
@@ -341,6 +342,29 @@ if (!$isAdminSubdomain && !$isCentralDomain) {
             Route::post('/recordings/{recording}/reject', [BTLiveRecordingController::class, 'reject'])->name('recordings.reject');
             Route::get('/recordings/{recording}/download', [BTLiveRecordingController::class, 'download'])->name('recordings.download');
             Route::get('/recordings', [BTLiveRecordingController::class, 'adminIndex'])->name('recordings.admin');
+        });
+
+        // BTLIVE V2 - Digital Classroom Routes
+        Route::prefix('btlive-v2')->name('tenant.btlive-v2.')->group(function () {
+            // Create session from curriculum
+            Route::post('/courses/{course}/sessions', [BTLiveV2Controller::class, 'storeSession'])->name('store_session');
+            
+            // Teacher routes
+            Route::get('/session/{session}/room', [BTLiveV2Controller::class, 'teacherRoom'])->name('teacher_room');
+            Route::post('/session/{session}/end', [BTLiveV2Controller::class, 'endSession'])->name('end_session');
+            Route::get('/session/{session}/state', [BTLiveV2Controller::class, 'getState'])->name('get_state');
+            Route::post('/session/{session}/teacher-event', [BTLiveV2Controller::class, 'handleTeacherEvent'])->name('teacher_event');
+            Route::post('/session/{session}/upload-pdf', [BTLiveV2Controller::class, 'uploadPdf'])->name('upload_pdf');
+            Route::post('/session/{session}/activate-pdf', [BTLiveV2Controller::class, 'activatePdf'])->name('activate_pdf');
+            
+            // Student routes
+            Route::get('/session/{session}/join', [BTLiveV2Controller::class, 'studentRoom'])->name('student_room');
+            Route::post('/session/{session}/join', [BTLiveV2Controller::class, 'joinSession'])->name('join_session');
+            Route::post('/participant/{participant}/event', [BTLiveV2Controller::class, 'handleStudentEvent'])->name('student_event');
+            
+            // Replay routes
+            Route::get('/replay/{recording}', [BTLiveV2Controller::class, 'getReplay'])->name('replay');
+            Route::get('/replay/{recording}/state', [BTLiveV2Controller::class, 'getReplayState'])->name('replay_state');
         });
 
         // Exams

@@ -29,12 +29,15 @@ class CurriculumController extends Controller
                 'subjects.contents.user',
                 'subjects.notes.user',
                 'subjects.liveClasses.creator',
+                'subjects.btliveSessions.teacher',
                 'subjects.chapters.contents.user',
                 'subjects.chapters.notes.user',
                 'subjects.chapters.liveClasses.creator',
+                'subjects.chapters.btliveSessions.teacher',
                 'subjects.chapters.lessons.contents.user',
                 'subjects.chapters.lessons.notes.user',
                 'subjects.chapters.lessons.liveClasses.creator',
+                'subjects.chapters.lessons.btliveSessions.teacher',
             ]);
         }]);
         

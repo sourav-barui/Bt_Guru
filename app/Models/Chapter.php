@@ -40,6 +40,11 @@ class Chapter extends Model
         return $this->hasMany(LiveClass::class)->orderBy('scheduled_at');
     }
 
+    public function btliveSessions(): HasMany
+    {
+        return $this->hasMany(BTLiveSession::class)->orderBy('scheduled_at');
+    }
+
     public function contents(): MorphMany
     {
         return $this->morphMany(CurriculumContent::class, 'contentable')->orderBy('order');
