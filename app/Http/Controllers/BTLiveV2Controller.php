@@ -95,7 +95,12 @@ class BTLiveV2Controller extends Controller
      */
     public function teacherRoom(BTLiveSession $session)
     {
-        // Authorization
+        // Authorization - check tenant ownership first
+        if ($session->tenant_id !== Auth::user()->tenant_id) {
+            abort(403, 'Unauthorized - Session does not belong to this tenant');
+        }
+
+        // Authorization - check teacher ownership
         if ($session->teacher_id !== Auth::id() && !Auth::user()->hasRole('tenant_admin')) {
             abort(403, 'Unauthorized');
         }
@@ -142,6 +147,12 @@ class BTLiveV2Controller extends Controller
      */
     public function studentRoom(BTLiveSession $session, Request $request)
     {
+        // Security - verify session belongs to current tenant
+        $currentTenant = app('current_tenant');
+        if ($currentTenant && $session->tenant_id !== $currentTenant->id) {
+            abort(403, 'Session not found in this tenant');
+        }
+
         // Validate access code
         if ($session->access_code && $request->get('code') !== $session->access_code) {
             return view('btlive.v2.access_code', compact('session'));
@@ -184,6 +195,12 @@ class BTLiveV2Controller extends Controller
      */
     public function joinSession(Request $request, BTLiveSession $session)
     {
+        // Security - verify session belongs to current tenant
+        $currentTenant = app('current_tenant');
+        if ($currentTenant && $session->tenant_id !== $currentTenant->id) {
+            return response()->json(['error' => 'Session not found'], 404);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:100',
             'code' => 'nullable|string',
@@ -251,6 +268,11 @@ class BTLiveV2Controller extends Controller
      */
     public function handleTeacherEvent(Request $request, BTLiveSession $session)
     {
+        // Security - verify session belongs to current tenant
+        if ($session->tenant_id !== Auth::user()->tenant_id) {
+            return response()->json(['error' => 'Unauthorized tenant'], 403);
+        }
+
         $validated = $request->validate([
             'event_type' => 'required|string',
             'data' => 'array',
@@ -284,6 +306,12 @@ class BTLiveV2Controller extends Controller
         // Validate participant belongs to current user or session
         $session = $participant->session;
 
+        // Security - verify session belongs to current tenant
+        $currentTenant = app('current_tenant');
+        if ($currentTenant && $session->tenant_id !== $currentTenant->id) {
+            return response()->json(['error' => 'Unauthorized tenant'], 403);
+        }
+
         $result = $this->wsService->handleStudentEvent(
             $validated['event_type'],
             $validated['data'] ?? [],
@@ -298,6 +326,16 @@ class BTLiveV2Controller extends Controller
      */
     public function uploadPdf(Request $request, BTLiveSession $session)
     {
+        // Security - verify session belongs to current tenant
+        if ($session->tenant_id !== Auth::user()->tenant_id) {
+            abort(403, 'Unauthorized tenant');
+        }
+
+        // Authorization - only teacher or admin can upload
+        if ($session->teacher_id !== Auth::id() && !Auth::user()->hasRole('tenant_admin')) {
+            abort(403, 'Unauthorized');
+        }
+
         $validated = $request->validate([
             'pdf' => 'required|file|mimes:pdf|max:50000',
             'title' => 'nullable|string|max:255',
@@ -327,6 +365,16 @@ class BTLiveV2Controller extends Controller
      */
     public function activatePdf(Request $request, BTLiveSession $session)
     {
+        // Security - verify session belongs to current tenant
+        if ($session->tenant_id !== Auth::user()->tenant_id) {
+            abort(403, 'Unauthorized tenant');
+        }
+
+        // Authorization - only teacher or admin can activate PDF
+        if ($session->teacher_id !== Auth::id() && !Auth::user()->hasRole('tenant_admin')) {
+            abort(403, 'Unauthorized');
+        }
+
         $validated = $request->validate([
             'pdf_id' => 'required|exists:btlive_pdfs,id',
             'page' => 'integer|min:1',
@@ -353,6 +401,12 @@ class BTLiveV2Controller extends Controller
      */
     public function getState(BTLiveSession $session, Request $request)
     {
+        // Security - verify session belongs to current tenant
+        $currentTenant = app('current_tenant');
+        if ($currentTenant && $session->tenant_id !== $currentTenant->id) {
+            abort(403, 'Session not found');
+        }
+
         $lastTimestamp = $request->get('last_timestamp', 0);
 
         $state = $this->broadcastService->getCurrentState($session);
@@ -375,6 +429,11 @@ class BTLiveV2Controller extends Controller
      */
     public function endSession(BTLiveSession $session)
     {
+        // Security - verify session belongs to current tenant
+        if ($session->tenant_id !== Auth::user()->tenant_id) {
+            return response()->json(['error' => 'Unauthorized tenant'], 403);
+        }
+
         // Authorization
         if ($session->teacher_id !== Auth::id() && !Auth::user()->hasRole('tenant_admin')) {
             return response()->json(['error' => 'Unauthorized'], 403);
@@ -397,6 +456,12 @@ class BTLiveV2Controller extends Controller
             ->where('is_approved', true)
             ->findOrFail($recordingId);
 
+        // Security - verify recording's session belongs to current tenant
+        $currentTenant = app('current_tenant');
+        if ($currentTenant && $recording->session && $recording->session->tenant_id !== $currentTenant->id) {
+            abort(403, 'Recording not found');
+        }
+
         $replayData = app(\App\Services\BTLive\BTLiveRecordingService::class)
             ->getReplayData($recordingId);
 
@@ -409,6 +474,13 @@ class BTLiveV2Controller extends Controller
     public function getReplayState(Request $request, int $recordingId)
     {
         $timestamp = $request->get('timestamp', 0);
+
+        // Security - verify recording belongs to current tenant
+        $recording = \App\Models\BTLiveRecording::with('session')->findOrFail($recordingId);
+        $currentTenant = app('current_tenant');
+        if ($currentTenant && $recording->session && $recording->session->tenant_id !== $currentTenant->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
 
         $state = app(\App\Services\BTLive\BTLiveRecordingService::class)
             ->getReplayStateAt($recordingId, $timestamp);
