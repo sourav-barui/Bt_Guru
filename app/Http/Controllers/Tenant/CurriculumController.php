@@ -24,22 +24,7 @@ class CurriculumController extends Controller
     {
         $this->authorizeCourse($course);
         
-        $course->load(['curricula' => function ($q) {
-            $q->with([
-                'subjects.contents.user',
-                'subjects.notes.user',
-                'subjects.liveClasses.creator',
-                'subjects.btliveSessions.teacher',
-                'subjects.chapters.contents.user',
-                'subjects.chapters.notes.user',
-                'subjects.chapters.liveClasses.creator',
-                'subjects.chapters.btliveSessions.teacher',
-                'subjects.chapters.lessons.contents.user',
-                'subjects.chapters.lessons.notes.user',
-                'subjects.chapters.lessons.liveClasses.creator',
-                'subjects.chapters.lessons.btliveSessions.teacher',
-            ]);
-        }]);
+        $course->load(['curricula.subjects.chapters.lessons']);
         
         return view('tenant.curriculum.index', compact('course'));
     }
