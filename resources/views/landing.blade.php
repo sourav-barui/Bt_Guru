@@ -23,7 +23,7 @@
 </script>
 
 <!-- Modern Navigation -->
-<nav class="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-800">
+<nav class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16 lg:h-20">
             <!-- Logo -->
@@ -31,27 +31,27 @@
                 <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/25 group-hover:shadow-orange-500/40 transition-all">
                     <span class="text-white font-bold text-lg">BT</span>
                 </div>
-                <span class="text-white font-bold text-xl tracking-tight">Guru</span>
+                <span class="text-gray-900 font-bold text-xl tracking-tight">Guru</span>
             </a>
 
             <!-- Desktop Menu -->
             <div class="hidden lg:flex items-center gap-8">
-                <a href="#features" class="text-slate-300 hover:text-white text-sm font-medium transition-colors">Features</a>
-                <a href="#solutions" class="text-slate-300 hover:text-white text-sm font-medium transition-colors">Solutions</a>
-                <a href="#pricing" class="text-slate-300 hover:text-white text-sm font-medium transition-colors">Pricing</a>
-                <a href="#about" class="text-slate-300 hover:text-white text-sm font-medium transition-colors">About</a>
+                <a href="#features" class="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors">Features</a>
+                <a href="#solutions" class="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors">Solutions</a>
+                <a href="#pricing" class="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors">Pricing</a>
+                <a href="#about" class="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors">About</a>
             </div>
 
             <!-- CTA Buttons -->
             <div class="hidden lg:flex items-center gap-4">
-                <a href="http://admin.{{ config('app.central_domain') }}/login" class="text-slate-300 hover:text-white text-sm font-medium transition-colors">Sign In</a>
+                <a href="http://admin.{{ config('app.central_domain') }}/login" class="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors">Sign In</a>
                 <a href="{{ route('tenant.register') }}" class="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40">
                     Start Free Trial
                 </a>
             </div>
 
             <!-- Mobile Toggle -->
-            <button id="mobile-menu-toggle" class="lg:hidden p-2 text-slate-300 hover:text-white">
+            <button id="mobile-menu-toggle" class="lg:hidden p-2 text-gray-600 hover:text-gray-900">
                 <svg id="menu-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                 </svg>
@@ -62,14 +62,14 @@
         </div>
 
         <!-- Mobile Menu -->
-        <div id="mobile-menu" class="lg:hidden hidden border-t border-slate-800 py-4">
+        <div id="mobile-menu" class="lg:hidden hidden border-t border-gray-200 py-4">
             <div class="flex flex-col gap-3">
-                <a href="#features" class="text-slate-300 hover:text-white py-2 text-sm font-medium">Features</a>
-                <a href="#solutions" class="text-slate-300 hover:text-white py-2 text-sm font-medium">Solutions</a>
-                <a href="#pricing" class="text-slate-300 hover:text-white py-2 text-sm font-medium">Pricing</a>
-                <a href="#about" class="text-slate-300 hover:text-white py-2 text-sm font-medium">About</a>
-                <hr class="border-slate-800 my-2">
-                <a href="http://admin.{{ config('app.central_domain') }}/login" class="text-slate-300 hover:text-white py-2 text-sm font-medium">Sign In</a>
+                <a href="#features" class="text-gray-600 hover:text-gray-900 py-2 text-sm font-medium">Features</a>
+                <a href="#solutions" class="text-gray-600 hover:text-gray-900 py-2 text-sm font-medium">Solutions</a>
+                <a href="#pricing" class="text-gray-600 hover:text-gray-900 py-2 text-sm font-medium">Pricing</a>
+                <a href="#about" class="text-gray-600 hover:text-gray-900 py-2 text-sm font-medium">About</a>
+                <hr class="border-gray-200 my-2">
+                <a href="http://admin.{{ config('app.central_domain') }}/login" class="text-gray-600 hover:text-gray-900 py-2 text-sm font-medium">Sign In</a>
                 <a href="{{ route('tenant.register') }}" class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-4 py-3 rounded-lg text-sm font-semibold text-center">
                     Start Free Trial
                 </a>
@@ -325,41 +325,42 @@
 </section>
 
 <!-- CTA Section -->
-<section class="relative py-24 bg-gradient-to-br from-orange-600 to-red-700 overflow-hidden">
-    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%22.05%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]"></div>
+<section class="relative py-24 bg-slate-950 overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-orange-600/10 via-transparent to-transparent"></div>
     <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 class="text-3xl lg:text-5xl font-bold text-white mb-6">Ready to transform your coaching centre?</h2>
-        <p class="text-orange-100 text-lg mb-10 max-w-2xl mx-auto">Join 500+ coaching centres already using BT Guru to streamline operations and grow their business.</p>
+        <p class="text-slate-300 text-lg mb-10 max-w-2xl mx-auto">Join 500+ coaching centres already using BT Guru to streamline operations and grow their business.</p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="{{ route('tenant.register') }}" class="bg-white text-orange-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-orange-50 transition-all shadow-xl inline-flex items-center justify-center gap-2">
+            <a href="{{ route('tenant.register') }}" class="bg-white text-slate-900 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all shadow-xl inline-flex items-center justify-center gap-2">
                 Start Free Trial
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
             </a>
-            <a href="#demo" class="bg-orange-700/50 text-white border border-orange-400/50 px-8 py-4 rounded-xl font-bold text-lg hover:bg-orange-700/70 transition-all inline-flex items-center justify-center">
+            <a href="#demo" class="bg-slate-800 text-white border border-slate-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-slate-700 transition-all inline-flex items-center justify-center">
                 Schedule Demo
             </a>
         </div>
-        <p class="mt-6 text-orange-200/80 text-sm">No credit card required • 14-day free trial • Cancel anytime</p>
+        <p class="mt-6 text-slate-400 text-sm">No credit card required • 14-day free trial • Cancel anytime</p>
     </div>
 </section>
 
 <!-- Footer -->
-<footer class="bg-slate-950 border-t border-slate-800 py-12">
+<footer class="bg-white border-t border-gray-200 py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center">
                     <span class="text-white font-bold">BT</span>
                 </div>
-                <span class="text-xl font-bold text-white">Guru</span>
+                <span class="text-xl font-bold text-gray-900">Guru</span>
             </div>
-            <div class="flex items-center gap-8 text-sm text-slate-400">
-                <a href="#features" class="hover:text-white transition-colors">Features</a>
-                <a href="#pricing" class="hover:text-white transition-colors">Pricing</a>
-                <a href="#" class="hover:text-white transition-colors">Privacy</a>
-                <a href="#" class="hover:text-white transition-colors">Terms</a>
+            <div class="flex items-center gap-8 text-sm text-gray-600">
+                <a href="#features" class="hover:text-gray-900 transition-colors">Features</a>
+                <a href="#pricing" class="hover:text-gray-900 transition-colors">Pricing</a>
+                <a href="#" class="hover:text-gray-900 transition-colors">Privacy</a>
+                <a href="#" class="hover:text-gray-900 transition-colors">Terms</a>
             </div>
-            <p class="text-slate-500 text-sm">&copy; {{ date('Y') }} BT Guru. All rights reserved.</p>
+            <p class="text-gray-500 text-sm">&copy; {{ date('Y') }} BT Guru. All rights reserved.</p>
         </div>
     </div>
 </footer>
