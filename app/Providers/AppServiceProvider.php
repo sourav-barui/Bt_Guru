@@ -6,12 +6,26 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\URL;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use App\Services\BTLive\BTLiveSessionService;
+use App\Services\BTLive\BTLiveBroadcastService;
+use App\Services\BTLive\BTLiveWebSocketService;
 
 class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        // Register BTLive V2 Services
+        $this->app->singleton(BTLiveSessionService::class, function ($app) {
+            return new BTLiveSessionService();
+        });
+        
+        $this->app->singleton(BTLiveBroadcastService::class, function ($app) {
+            return new BTLiveBroadcastService();
+        });
+        
+        $this->app->singleton(BTLiveWebSocketService::class, function ($app) {
+            return new BTLiveWebSocketService();
+        });
     }
 
     public function boot(): void
